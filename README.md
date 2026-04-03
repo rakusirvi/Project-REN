@@ -5,7 +5,7 @@
 - Full_name
 - Company_name
 - Email
-- profile_pic
+
 - Password_hash
 - Phone
 - Company_profile
@@ -36,14 +36,13 @@
 
 - Email
 - Password_hash
-- OTP
+
 
 #### Logic :
 
 - Check if email exists.
 - Check if password is correct.
-- Check if OTP varified
-
+- Check if varified
 #### Functions :
 
 - if Varified
@@ -61,7 +60,7 @@
 
 ### InputData :
 
-- Ceo_ID : moongoose.Schema.Types.ObjectId
+- Ceo_ID : moongoose.Schema.Types ObjectId
 - Manager_Name
 - Manager_Email : Unique
 - Manager_Phone : Unique
