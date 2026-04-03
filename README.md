@@ -37,12 +37,12 @@
 - Email
 - Password_hash
 
-
 #### Logic :
 
 - Check if email exists.
 - Check if password is correct.
 - Check if varified
+
 #### Functions :
 
 - if Varified
@@ -129,14 +129,16 @@ else show error
 
 # ManagerLogin -- POST : /api/auth/manager-login
 
-### input Data : 
-- Email 
+### input Data :
+
+- Email
 - Password
 
 #### Logic :
 
-login Success 
+login Success
 generate Token
 
 ### Response :
+
 - login Sucess

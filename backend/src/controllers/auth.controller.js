@@ -6,6 +6,7 @@ import sendEmail from "../services/emailService.js";
 import jwt from "jsonwebtoken";
 import config from "../config/env.config.js";
 
+// DONE
 export async function AdminSignUP(req, res) {
   const {
     full_name,
@@ -58,6 +59,7 @@ export async function AdminSignUP(req, res) {
   }
 }
 
+// DONE
 export async function AdminVerify(req, res) {
   const { email, otp } = req.body;
 
@@ -91,13 +93,13 @@ export async function AdminVerify(req, res) {
     await OtpModel.deleteOne({ email });
 
     const accessToken = jwt.sign(
-      { id: admin._id, company_name: admin.company_name },
+      { id: admin._id, company_name: admin.company_name , role: admin.role},
       config.JWT_SECRET,
       { expiresIn: "15m" },
     );
 
     const refreshToken = jwt.sign(
-      { id: admin._id, company_name: admin.company_name },
+      { id: admin._id, company_name: admin.company_name , role: admin.role},
       config.JWT_SECRET,
       { expiresIn: "7d" },
     );
@@ -120,6 +122,7 @@ export async function AdminVerify(req, res) {
   }
 }
 
+// DONE
 export async function AdminLogin(req, res) {
   const { email, password } = req.body;
 
@@ -139,13 +142,13 @@ export async function AdminLogin(req, res) {
     }
 
     const accessToken = jwt.sign(
-      { id: admin._id, company_name: admin.company_name },
+      { id: admin._id, company_name: admin.company_name , role: admin.role},
       config.JWT_SECRET,
       { expiresIn: "15m" },
     );
 
     const refreshToken = jwt.sign(
-      { id: admin._id, company_name: admin.company_name },
+      { id: admin._id, company_name: admin.company_name , role: admin.role},
       config.JWT_SECRET,
       { expiresIn: "7d" },
     );
@@ -168,8 +171,8 @@ export async function AdminLogin(req, res) {
   }
 }
 
+// DONE
 export async function getMe(req, res) {
-
   const accessToken = req.headers.authorization?.split(" ")[1];
 
   if (!accessToken) {
@@ -187,12 +190,10 @@ export async function getMe(req, res) {
   });
 }
 
-
 export async function ManagerAuthenticate(req, res) {
   try {
   } catch (error) {}
 }
-
 
 export async function ManagerChangePassword(req, res) {
   try {
@@ -204,6 +205,7 @@ export async function ManagerLogin(req, res) {
   } catch (error) {}
 }
 
+// UPDATE NEDDED
 export async function refreshAccessToken(req, res) {
   try {
     // 1. Get the Refresh Token from the cookies
@@ -231,12 +233,12 @@ export async function refreshAccessToken(req, res) {
 
     // 4. Generate a NEW Access Token (15 mins)
     const newAccessToken = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, company_name: user.company_name, role: user.role },
       config.JWT_SECRET,
       { expiresIn: "15m" },
     );
 
-    const newRefreshToken = jwt.sign({ id: user._id }, config.JWT_SECRET, {
+    const newRefreshToken = jwt.sign({ id: user._id , company_name: user.company_name, role: user.role }, config.JWT_SECRET, {
       expiresIn: "7d",
     });
 
@@ -257,3 +259,4 @@ export async function refreshAccessToken(req, res) {
     });
   }
 }
+
