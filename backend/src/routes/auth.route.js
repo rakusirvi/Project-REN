@@ -3,29 +3,29 @@ import {
   AdminLogin,
   AdminSignUP,
   ManagerAuthenticate,
-  ManagerChangePassword,
-  AdminVerify,
-  refreshAccessToken,
+  ManagerSetPassword,
+  AdminAuthenticate,
+  ReloadToken,
   getMe,
+  ManagerLogin,
 } from "../controllers/auth.controller.js";
 
 const AuthRoute = Router();
 
 // Admin
-
 AuthRoute.post("/admin-signup", AdminSignUP);
 AuthRoute.post("/admin-login", AdminLogin);
-AuthRoute.post("/admin-verify", AdminVerify);
+AuthRoute.post("/admin-authenticate", AdminAuthenticate);
 
 // All
-
 AuthRoute.get("/get-me", getMe);
-AuthRoute.get("/reload-token", refreshAccessToken);
+AuthRoute.get("/reload-token", ReloadToken);
 
 // Manager
 
 AuthRoute.post("/manager-authenticate", ManagerAuthenticate);
-AuthRoute.post("/manager-change-password", ManagerChangePassword);
+AuthRoute.post("/manager-set-password", ManagerSetPassword);
+AuthRoute.post("/manager-login", ManagerLogin);
 
 // Employee
 

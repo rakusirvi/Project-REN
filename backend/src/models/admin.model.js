@@ -35,7 +35,7 @@ const AdminSchema = new mongoose.Schema(
     company_profile: {
       type: String,
       trim: true,
-      default : ""
+      default: "",
     },
     verified: {
       type: Boolean,
@@ -43,7 +43,7 @@ const AdminSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "CEO",
+      default: "ADMIN",
     },
   },
   {
