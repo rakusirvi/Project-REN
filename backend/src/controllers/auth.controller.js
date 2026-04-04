@@ -93,13 +93,13 @@ export async function AdminVerify(req, res) {
     await OtpModel.deleteOne({ email });
 
     const accessToken = jwt.sign(
-      { id: admin._id, company_name: admin.company_name , role: admin.role},
+      { id: admin._id, company_name: admin.company_name, role: admin.role },
       config.JWT_SECRET,
       { expiresIn: "15m" },
     );
 
     const refreshToken = jwt.sign(
-      { id: admin._id, company_name: admin.company_name , role: admin.role},
+      { id: admin._id, company_name: admin.company_name, role: admin.role },
       config.JWT_SECRET,
       { expiresIn: "7d" },
     );
@@ -142,13 +142,13 @@ export async function AdminLogin(req, res) {
     }
 
     const accessToken = jwt.sign(
-      { id: admin._id, company_name: admin.company_name , role: admin.role},
+      { id: admin._id, company_name: admin.company_name, role: admin.role },
       config.JWT_SECRET,
       { expiresIn: "15m" },
     );
 
     const refreshToken = jwt.sign(
-      { id: admin._id, company_name: admin.company_name , role: admin.role},
+      { id: admin._id, company_name: admin.company_name, role: admin.role },
       config.JWT_SECRET,
       { expiresIn: "7d" },
     );
@@ -191,7 +191,50 @@ export async function getMe(req, res) {
 }
 
 export async function ManagerAuthenticate(req, res) {
+  const { email, joiningToken } = req.body;
+
+  if (!email || !joiningToken) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
   try {
+    const manager = await Manager.findOne({ email });
+    if (!manager) {
+      return res.status(400).json({ message: "Manager not found" });
+    }
+
+    const isJoiningTokenValid = await bcrypt.compare(
+      joiningToken,
+      manager.joiningTokenHash,
+    );
+    if (!isJoiningTokenValid) {
+      return res.status(400).json({ message: "Invalid Joining Token" });
+    }
+
+    const accessToken = jwt.sign(
+      { id: manager._id, role: manager.role },
+      config.JWT_SECRET,
+      { expiresIn: "15m" },
+    );
+
+    const refreshToken = jwt.sign(
+      { id: manager._id, role: manager.role },
+      config.JWT_SECRET,
+      { expiresIn: "7d" },
+    );
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false, // Set to true in production (HTTPS)
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+      message: "Login successful",
+      accessToken,
+      manager,
+    });
   } catch (error) {}
 }
 
@@ -238,9 +281,13 @@ export async function refreshAccessToken(req, res) {
       { expiresIn: "15m" },
     );
 
-    const newRefreshToken = jwt.sign({ id: user._id , company_name: user.company_name, role: user.role }, config.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const newRefreshToken = jwt.sign(
+      { id: user._id, company_name: user.company_name, role: user.role },
+      config.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      },
+    );
 
     // 5. Overwrite the old cookie with the new one
     res.cookie("refreshToken", newRefreshToken, {
@@ -259,4 +306,3 @@ export async function refreshAccessToken(req, res) {
     });
   }
 }
-
