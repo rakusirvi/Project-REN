@@ -10,13 +10,11 @@ export const authMiddleware = (req, res, next) => {
         .status(401)
         .json({ message: "Access Denied. No token provided." });
     }
-    
+
     const token = authHeader.split(" ")[1];
     const decodedToken = jwt.verify(token, config.JWT_SECRET);
 
     req.user = decodedToken;
-
-
 
     next();
   } catch (error) {

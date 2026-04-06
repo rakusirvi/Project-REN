@@ -8,6 +8,7 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
 const GOOGLE_USER = process.env.GOOGLE_USER;
+const GOOGLR_APP_PASS = process.env.GOOGLR_APP_PASS;
 
 if (
   !PORT ||
@@ -16,7 +17,8 @@ if (
   !GOOGLE_CLIENT_ID ||
   !GOOGLE_CLIENT_SECRET ||
   !GOOGLE_REFRESH_TOKEN ||
-  !GOOGLE_USER
+  !GOOGLE_USER ||
+  !GOOGLR_APP_PASS
 ) {
   new Error("Some thing is not defined in Env");
 }
@@ -29,6 +31,7 @@ const config = {
   GOOGLE_CLIENT_SECRET: GOOGLE_CLIENT_SECRET,
   GOOGLE_REFRESH_TOKEN: GOOGLE_REFRESH_TOKEN,
   GOOGLE_USER: GOOGLE_USER,
+  GOOGLR_APP_PASS: GOOGLR_APP_PASS,
 };
 
 export default config;

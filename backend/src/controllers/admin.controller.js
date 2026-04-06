@@ -21,7 +21,7 @@ export async function addManager(req, res) {
     // 3. Create the Manager
     // NOTE: Changed 'company' to 'company_name' to match your JWT logic
     const manager = await Manager.create({
-      ceo_id: req.user.id,
+      admin_id: req.user.id,
       name: name,
       company_name: req.user.company_name, // Pulls from the Admin's JWT
       email: email,
@@ -29,13 +29,12 @@ export async function addManager(req, res) {
       joiningTokenHash: joiningTokenHash,
     });
 
-    // 4. Send Email (Don't await this if you want a faster response)
     if (manager) {
       sendEmail(
         email,
-        "Your REN Joining Token",
+        "REN Joining Token",
         "",
-        getJoiningTokenHTML(joiningToken),
+        getJoiningTokenHTML(joiningToken, type, type),
       );
     }
 
@@ -44,8 +43,8 @@ export async function addManager(req, res) {
       manager,
     });
   } catch (error) {
-    console.error("Add Manager Error:", error.message);
-    return res.status(500).json({ message: "Internal Server Error" });
+    console.error("Add Manager Error:", error);
+    return res.status(500).json({ message: error });
   }
 }
 

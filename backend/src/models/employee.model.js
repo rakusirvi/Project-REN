@@ -1,24 +1,31 @@
 import mongoose from "mongoose";
 
-const ManagerSchema = new mongoose.Schema(
+const EmployeeSchema = new mongoose.Schema(
   {
     admin_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Admin",
     },
-    name: {
-      type: String,
-      required: [true, "Manager name is required"],
-      trim: true,
+    manager_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Manager",
     },
+
     company_name: {
       type: String,
       required: [true, "Company name is required"],
       trim: true,
     },
+
+    name: {
+      type: String,
+      required: [true, "Employee name is required"],
+      trim: true,
+    },
+
     email: {
       type: String,
-      required: [true, "Manager email is required"],
+      required: [true, "Employee email is required"],
       unique: true,
       lowercase: true,
       trim: true,
@@ -38,7 +45,7 @@ const ManagerSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "manager",
+      default: "employee",
     },
     joiningTokenHash: {
       type: String,
@@ -60,6 +67,6 @@ const ManagerSchema = new mongoose.Schema(
   },
 );
 
-const Manager = mongoose.model("Manager", ManagerSchema);
+const Employee = mongoose.model("Employee", EmployeeSchema);
 
-export default Manager;
+export default Employee;

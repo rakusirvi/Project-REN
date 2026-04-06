@@ -5,8 +5,8 @@ import config from "../config/env.config.js";
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    type: "OAuth2",
     user: config.GOOGLE_USER,
+    pass: config.GOOGLR_APP_PASS,
     clientId: config.GOOGLE_CLIENT_ID,
     clientSecret: config.GOOGLE_CLIENT_SECRET,
     refreshToken: config.GOOGLE_REFRESH_TOKEN,
@@ -40,4 +40,3 @@ const sendEmail = async (to, subject, text, html) => {
 };
 
 export default sendEmail;
-

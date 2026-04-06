@@ -6,27 +6,44 @@ import sendEmail from "../services/emailService.js";
 import jwt from "jsonwebtoken";
 import config from "../config/env.config.js";
 import Manager from "../models/manager.model.js";
+import Employee from "../models/employee.model.js";
 
 // DONE
 export async function AdminSignUP(req, res) {
-  const { full_name, company_name, email, password, phone } = req.body;
+  const {
+    name,
+    company_name,
+    company_location,
+    company_email,
+    password,
+    phone,
+  } = req.body;
 
-  if (!full_name || !company_name || !email || !password || !phone) {
+  if (
+    !name ||
+    !company_name ||
+    !company_location ||
+    !company_email ||
+    !password ||
+    !phone
+  ) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
-    const isAdminExists = await Admin.findOne({ email });
+    const isAdminExists = await Admin.findOne({ company_email });
 
     if (isAdminExists) {
       return res.status(400).json({ message: "Admin already exists" });
     }
 
     const password_hash = await bcrypt.hash(password, 10);
+
     const admin = new Admin({
-      full_name,
+      name,
       company_name,
-      email,
+      company_location,
+      company_email,
       password_hash,
       phone,
     });
@@ -36,11 +53,13 @@ export async function AdminSignUP(req, res) {
     const otp = generateOtp();
     const otpHash = await bcrypt.hash(otp, 10);
     const adminOtp = new OtpModel({
-      email,
+      email: company_email,
       otpHash,
     });
+
     await adminOtp.save();
-    await sendEmail(email, "Welcome to REN.", "", getOtpHtml(otp));
+    await sendEmail(company_email, "Welcome to REN.", "", getOtpHtml(otp));
+
     return res
       .status(200)
       .json({ message: "OTP sent successfully", admin, otp });
@@ -62,10 +81,11 @@ export async function AdminAuthenticate(req, res) {
     if (!isOtpValid) return res.status(400).json({ message: "Invalid OTP" });
 
     const admin = await Admin.findOneAndUpdate(
-      { email },
+      { company_email: email },
       { verified: true },
-      { new: true },
+      { returnDocument: "after" },
     );
+
     if (!admin) return res.status(404).json({ message: "Admin not found" });
 
     await OtpModel.deleteOne({ email });
@@ -75,6 +95,7 @@ export async function AdminAuthenticate(req, res) {
       company_name: admin.company_name,
       role: admin.role,
     };
+
     const accessToken = jwt.sign(payload, config.JWT_SECRET, {
       expiresIn: "15m",
     });
@@ -108,7 +129,7 @@ export async function AdminLogin(req, res) {
   }
 
   try {
-    const admin = await Admin.findOne({ email });
+    const admin = await Admin.findOne({ company_email: email });
     if (!admin) {
       return res.status(400).json({ message: "Admin not found" });
     }
@@ -124,17 +145,18 @@ export async function AdminLogin(req, res) {
       return res.status(400).json({ message: "Invalid Password" });
     }
 
-    const accessToken = jwt.sign(
-      { id: admin._id, company_name: admin.company_name, role: admin.role },
-      config.JWT_SECRET,
-      { expiresIn: "15m" },
-    );
+    const payload = {
+      id: admin._id,
+      company_name: admin.company_name,
+      role: admin.role,
+    };
+    const accessToken = jwt.sign(payload, config.JWT_SECRET, {
+      expiresIn: "15m",
+    });
 
-    const refreshToken = jwt.sign(
-      { id: admin._id, company_name: admin.company_name, role: admin.role },
-      config.JWT_SECRET,
-      { expiresIn: "7d" },
-    );
+    const refreshToken = jwt.sign(payload, config.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -153,6 +175,7 @@ export async function AdminLogin(req, res) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
 // DONE
 export async function getMe(req, res) {
   try {
@@ -164,9 +187,12 @@ export async function getMe(req, res) {
     const decoded = jwt.verify(token, config.JWT_SECRET);
 
     let user;
-    if (decoded.role === "ADMIN") user = await Admin.findById(decoded.id);
-    else if (decoded.role === "MANAGER")
+
+    if (decoded.role === "admin") user = await Admin.findById(decoded.id);
+    else if (decoded.role === "manager")
       user = await Manager.findById(decoded.id);
+    else if (decoded.role === "employee")
+      user = await Employee.findById(decoded.id);
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -175,13 +201,136 @@ export async function getMe(req, res) {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 }
+
+//UPDATE NEDDED
+export async function ReloadToken(req, res) {
+  try {
+    // 1. Get the current Refresh Token
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: "UnAuthorized" });
+    }
+
+    // 2. Verify the token
+    const decoded = jwt.verify(refreshToken, config.JWT_SECRET);
+
+    // 3. Find the user based on role
+    let user;
+    if (decoded.role === "admin") {
+      user = await Admin.findById(decoded.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const payload = {
+        id: user._id,
+        role: user.role,
+      };
+
+      const newAccessToken = jwt.sign(payload, config.JWT_SECRET, {
+        expiresIn: "15m",
+      });
+      const newRefreshToken = jwt.sign(payload, config.JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      // 6. Overwrite the old cookie with the NEW Refresh Token
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+
+      // 7. Send the new Access Token in the response body
+      return res.status(200).json({
+        accessToken: newAccessToken,
+        message: "Tokens refreshed successfully",
+      });
+    } else if (decoded.role === "manager") {
+      user = await Manager.findById(decoded.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const payload = {
+        id: user._id,
+        admin_id: user.admin_id,
+        company_name: user.company_name,
+        role: user.role,
+      };
+
+      const newAccessToken = jwt.sign(payload, config.JWT_SECRET, {
+        expiresIn: "15m",
+      });
+
+      const newRefreshToken = jwt.sign(payload, config.JWT_SECRET, {
+        expiresIn: "7d",
+      });
+
+      // 6. Overwrite the old cookie with the NEW Refresh Token
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+
+      // 7. Send the new Access Token in the response body
+      return res.status(200).json({
+        accessToken: newAccessToken,
+        message: "Tokens refreshed successfully",
+      });
+    } else if (decoded.role === "employee") {
+      user = await Employee.findById(decoded.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const payload = {
+        id: user._id,
+        manager_id: user.manager_id,
+        admin_id: user.admin_id,
+        role: user.role,
+      };
+
+      const newAccessToken = jwt.sign(payload, config.JWT_SECRET, {
+        expiresIn: "15m",
+      });
+
+      const newRefreshToken = jwt.sign(payload, config.JWT_SECRET, {
+        expiresIn: "7d",
+      });
+
+      // 6. Overwrite the old cookie with the NEW Refresh Token
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+
+      // 7. Send the new Access Token in the response body
+      return res.status(200).json({
+        accessToken: newAccessToken,
+        message: "Tokens refreshed successfully",
+      });
+    }
+  } catch (error) {
+    // If verify fails (expired or tampered), clear the cookie and reject
+    res.clearCookie("refreshToken");
+    return res.status(403).json({
+      message: "Session expired, please login again",
+    });
+  }
+}
+
 //DONE
 export async function ManagerAuthenticate(req, res) {
   const { email, joiningToken } = req.body;
 
   try {
     const manager = await Manager.findOne({ email });
-    if (!manager) return res.status(404).json({ message: "Manager not found" });
+    if (!manager) return res.status(404).json({ message: "Email not found" });
 
     const isTokenValid = await bcrypt.compare(
       joiningToken,
@@ -191,12 +340,13 @@ export async function ManagerAuthenticate(req, res) {
       return res.status(400).json({ message: "Invalid Joining Token" });
 
     // FIX: Renamed variable to avoid shadowing the Model name
-    manager.joiningTokenHash = "";
-    manager.verified = true;
+    manager.joiningTokenHash = null;
+    manager.joined = true;
     await manager.save();
 
     const payload = {
       id: manager._id,
+      admin_id: manager.admin_id,
       company_name: manager.company_name,
       role: manager.role,
     };
@@ -224,15 +374,22 @@ export async function ManagerAuthenticate(req, res) {
   }
 }
 
+//DONE
 export async function ManagerSetPassword(req, res) {
-  const { email, password, confirmPassword } = req.body;
+  const { password, confirmPassword } = req.body;
   try {
-    const manager = await Manager.findOne({ email });
+    const manager = await Manager.findOne({
+      _id: req.user.id,
+      email: req.user.email,
+    });
+
     if (!manager) return res.status(404).json({ message: "Manager not found" });
+
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
     manager.password_hash = await bcrypt.hash(password, 10);
+    manager.verified = true;
     await manager.save();
     return res.status(200).json({ message: "Password changed successfully" });
   } catch (error) {
@@ -248,7 +405,7 @@ export async function ManagerLogin(req, res) {
     const manager = await Manager.findOne({ email });
     if (!manager) return res.status(404).json({ message: "Manager not found" });
 
-    if (!manager.verified) {
+    if (!manager.joined) {
       return res.status(400).json({
         message: "You are not verified Ask Admin to Resend the Request",
       });
@@ -266,25 +423,19 @@ export async function ManagerLogin(req, res) {
     if (!isPasswordValid)
       return res.status(400).json({ message: "Invalid Password" });
 
-    const accessToken = jwt.sign(
-      {
-        id: manager._id,
-        company_name: manager.company_name,
-        role: manager.role,
-      },
-      config.JWT_SECRET,
-      { expiresIn: "15m" },
-    );
+    const payload = {
+      id: manager._id,
+      admin_id: manager.admin_id,
+      company_name: manager.company_name,
+      role: manager.role,
+    };
+    const accessToken = jwt.sign(payload, config.JWT_SECRET, {
+      expiresIn: "15m",
+    });
 
-    const refreshToken = jwt.sign(
-      {
-        id: manager._id,
-        company_name: manager.company_name,
-        role: manager.role,
-      },
-      config.JWT_SECRET,
-      { expiresIn: "7d" },
-    );
+    const refreshToken = jwt.sign(payload, config.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -298,67 +449,147 @@ export async function ManagerLogin(req, res) {
       accessToken,
       manager: manager,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 }
 
-// UPDATE NEDDED
-export async function ReloadToken(req, res) {
+export async function EmployeeAuthenticate(req, res) {
+  const { email, joiningToken } = req.body;
+
   try {
-    // 1. Get the current Refresh Token
-    const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) {
-      return res.status(401).json({ message: "No Refresh Token provided" });
-    }
+    const employee = await Employee.findOne({ email });
+    if (!employee) return res.status(404).json({ message: "Email not found" });
 
-    // 2. Verify the token
-    const decoded = jwt.verify(refreshToken, config.JWT_SECRET);
+    const isTokenValid = await bcrypt.compare(
+      joiningToken,
+      employee.joiningTokenHash,
+    );
+    if (!isTokenValid)
+      return res.status(400).json({ message: "Invalid Joining Token" });
 
-    // 3. Find the user based on role
-    let user;
-    if (decoded.role === "ADMIN") {
-      user = await Admin.findById(decoded.id);
-    } else if (decoded.role === "MANAGER") {
-      user = await Manager.findById(decoded.id);
-    }
+    employee.joiningTokenHash = null;
+    employee.joined = true;
+    await employee.save();
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // 4. Create the payload
     const payload = {
-      id: user._id,
-      company_name: user.company_name,
-      role: user.role,
+      id: employee._id,
+      admin_id: employee.admin_id,
+      manager_id: employee.manager_id,
+      role: employee.role,
     };
 
-    // 5. Generate BOTH new tokens
-    const newAccessToken = jwt.sign(payload, config.JWT_SECRET, {
+    const accessToken = jwt.sign(payload, config.JWT_SECRET, {
       expiresIn: "15m",
     });
-
-    const newRefreshToken = jwt.sign(payload, config.JWT_SECRET, {
+    const refreshToken = jwt.sign(payload, config.JWT_SECRET, {
       expiresIn: "7d",
     });
 
-    // 6. Overwrite the old cookie with the NEW Refresh Token
-    res.cookie("refreshToken", newRefreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // 7. Send the new Access Token in the response body
     return res.status(200).json({
-      accessToken: newAccessToken,
-      message: "Tokens refreshed successfully",
+      message: "Login successful",
+      accessToken,
+      employee: employee,
     });
   } catch (error) {
-    // If verify fails (expired or tampered), clear the cookie and reject
-    res.clearCookie("refreshToken");
-    return res.status(403).json({
-      message: "Session expired, please login again",
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function EmployeeSetPassword(req, res) {
+  const { password, confirmPassword } = req.body;
+  try {
+    const employee = await Employee.findOne({
+      _id: req.user.id,
     });
+
+    if (!employee)
+      return res.status(404).json({ message: "Employee not found" });
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+    employee.password_hash = await bcrypt.hash(password, 10);
+    employee.verified = true;
+    await employee.save();
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function EmployeeLogin(req, res) {
+  const { email, password } = req.body;
+  try {
+    const employee = await Employee.findOne({ email });
+    if (!employee)
+      return res.status(404).json({ message: "Employee not found" });
+
+    if (!employee.joined) {
+      return res.status(400).json({
+        message: "You are not verified Ask Admin to Resend the Request",
+      });
+    }
+    if (!employee.password_hash) {
+      return res.status(400).json({
+        message:
+          "You Have Not Set Password Yet. Please Ask Admin to Resend the Request",
+      });
+    }
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      employee.password_hash,
+    );
+    if (!isPasswordValid)
+      return res.status(400).json({ message: "Invalid Password" });
+
+    const payload = {
+      id: employee._id,
+      admin_id: employee.admin_id,
+      manager_id: employee.manager_id,
+      role: employee.role,
+    };
+    const accessToken = jwt.sign(payload, config.JWT_SECRET, {
+      expiresIn: "15m",
+    });
+
+    const refreshToken = jwt.sign(payload, config.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+      message: "Login successful",
+      accessToken,
+      employee: employee,
+    });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function Logout(req, res) {
+  try {
+    res.clearCookie("refreshToken");
+    return res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 }

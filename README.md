@@ -1,111 +1,47 @@
-# CEO registration. -- POST : /api/auth/ceo-signup
+# Admin registration. -- POST : /api/auth/admin-signup
 
 ### InputData :
 
-- Full_name
-- Company_name
-- Email
-
-- Password_hash
-- Phone
-- Company_profile
-- Varified : 'false'
-- role : 'CEO'
-
-#### Logic :
-
-- Check if email exists.
-- Hash password (bcrypt.hash).
-- Save CEO to MongoDB.
-- Generate JWT and set the Refresh Token in a cookie.
-- OTP Generation
-
-#### Functions :
-
-- Mail (OTP Generator)
-- Token Generator (JWT)
+name ,company_name,company_location,company_email,password_hash,phone,company_profile,varified : 'false',role : 'admin'
 
 ### Response :
 
-- data
-- token (access refresh)
+admin,otp
 
-# CEO Login -- ## POST : /api/auth/ceo-login
+# CEO Authenticate -- ## POST : /api/auth/admin-authenticate
 
 ### InputData :
 
-- Email
-- Password_hash
-
-#### Logic :
-
-- Check if email exists.
-- Check if password is correct.
-- Check if varified
-
-#### Functions :
-
-- if Varified
-  i. Generate JWT and set the Refresh Token in a cookie.
-  ii.- CEO.varifed: true
-- else Not VariFied
-  i. Give Correct Data
+Email,otp
 
 ### Response :
 
-- data
-- token
+admin,acess token
+
+# CEO Login -- ## POST : /api/auth/admin-login
+
+### InputData :
+
+Email,Password_hash
+
+### Response :
+
+admin,token
 
 # AddManager -- POST : /api/admin/add-manager
-
 ### InputData :
-
-- Ceo_ID : moongoose.Schema.Types ObjectId
-- Manager_Name
-- Manager_Email : Unique
-- Manager_Phone : Unique
-- Manager_Type
-- Manager_Profile_pic
-- role : "MANAGER"
-- joiningTokenHash : "Random Token " : "" <- if user Logined Success
-- varified : "false"
-- password : ""
-
-#### Logic :
-
-- Check if email exists.
-- Save Manager to MongoDB.
-
-#### Functions :
-
-- GenerateRandom JoiningToken
-- Mail (send JoiningToken)
-- HashJoiningToken and Save to DB
-- varified : false
-
+admin_id : moongoose.Schema.Types ObjectId,name,email : Unique,type,joiningTokenHash : "Random Token " : "" <- if user Logined Success
 ### Response :
-
-- data
-- Email Send ..
+data
 
 # ManagerAuthenticate -- POST : /api/auth/manager-authenticate
 
 ### InputData :
-
-- Email
-- JoiningToken : convert to hash and check with DB
-
-#### Logic :
-
-- if inCorrect Token -> Invalid User
-- if Correct Token -> Manager.varified : true
-- generate JWT and set the Refresh Token in a cookie.
-- generate New Password : hashPass Save to DB
+Email,JoiningToken
 
 ### Response :
+data,token
 
-- data
-- token
 
 # ManagerChangePassword -- POST : /api/auth/manager-change-password
 
@@ -142,3 +78,12 @@ generate Token
 ### Response :
 
 - login Sucess
+
+
+
+
+AuthRoute.post("/employee-authenticate", ManagerAuthenticate);
+AuthRoute.post("/employee-set-password", authMiddleware, ManagerSetPassword);
+AuthRoute.post("/employee-login", ManagerLogin);
+
+
