@@ -166,9 +166,8 @@ export async function AdminLogin(req, res) {
     });
 
     return res.status(200).json({
-      message: "Login successful",
       accessToken,
-      admin,
+      data: admin,
     });
   } catch (error) {
     console.error(error.message);
@@ -445,9 +444,8 @@ export async function ManagerLogin(req, res) {
     });
 
     return res.status(200).json({
-      message: "Login successful",
       accessToken,
-      manager: manager,
+      data: manager,
     });
   } catch (error) {
     console.error(error.message);
@@ -574,9 +572,8 @@ export async function EmployeeLogin(req, res) {
     });
 
     return res.status(200).json({
-      message: "Login successful",
       accessToken,
-      employee: employee,
+      data: employee,
     });
   } catch (error) {
     console.error(error.message);
