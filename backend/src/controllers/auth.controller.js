@@ -60,9 +60,7 @@ export async function AdminSignUP(req, res) {
     await adminOtp.save();
     await sendEmail(company_email, "Welcome to REN.", "", getOtpHtml(otp));
 
-    return res
-      .status(200)
-      .json({ message: "OTP sent successfully", admin, otp });
+    return res.status(200).json({ success: true, message: "OTP Sent", otp });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -113,7 +111,7 @@ export async function AdminAuthenticate(req, res) {
     return res.status(200).json({
       message: "OTP verified successfully",
       accessToken,
-      admin,
+      data: admin ,
     });
   } catch (error) {
     console.error(error);
@@ -178,12 +176,7 @@ export async function AdminLogin(req, res) {
 // DONE
 export async function getMe(req, res) {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader)
-      return res.status(401).json({ message: "No token provided" });
-
-    const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, config.JWT_SECRET);
+    const decoded = req.user;
 
     let user;
 

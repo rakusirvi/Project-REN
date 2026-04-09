@@ -21,9 +21,9 @@ AuthRoute.post("/admin/signup", AdminSignUP);
 AuthRoute.post("/admin/login", AdminLogin);
 AuthRoute.post("/admin/authenticate", AdminAuthenticate);
 
-// // All
-AuthRoute.get("/get-me", getMe);
-AuthRoute.get("/reload-token", authMiddleware, ReloadToken);
+// All
+AuthRoute.get("/get-me", authMiddleware, getMe);
+AuthRoute.post("/reload-token", ReloadToken);
 
 // Manager
 AuthRoute.post("/manager/authenticate", ManagerAuthenticate);

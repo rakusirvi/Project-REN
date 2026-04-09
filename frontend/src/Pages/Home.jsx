@@ -1,25 +1,20 @@
-import AdminDashboardData from "./DashBoard/AdminDashboardData";
-import EmployeeTaskBoard from "./DashBoard/EmployeeTaskBoard";
-import ManagerTeamView from "./DashBoard/ManagerTeamView";
-import useAuthStore from "../Store/useAuthStore";
-import Footer from "../Components/Footer";
-import Navbar from "../Components/Navbar";
-const HomePage = () => {
-  const { user } = useAuthStore();
-
+import React from "react";
+import { useAuth } from "../ContextAPI/AuthContext";
+const Home = () => {
+  const { user, isAuthenticated, getMe, isLoading, logout } = useAuth();
   return (
     <>
-      <Navbar />
-      <div className="min-h-screen bg-slate-50 font-sans">
-        <main className="p-8">
-          <AdminDashboardData />
-          <ManagerTeamView />
-          <EmployeeTaskBoard />
-        </main>
+      <div>Home</div>
+
+      <div>
+        <h1>{user.name}</h1>
+        <p>{user.company_email}</p>
+        <p>{user.role}</p>
       </div>
-      <Footer />
+
+      <button onClick={() => logout()}>Logout</button>
     </>
   );
 };
 
-export default HomePage;
+export default Home;
