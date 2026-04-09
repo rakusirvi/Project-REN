@@ -114,9 +114,9 @@ const Login = () => {
               <div className="grid grid-cols-1 gap-3">
                 <button
                   onClick={() => setJoinUsingkey(false)}
-                  className="py-3 flex justify-center items-center gap-2 rounded-lg bg-white/10 border border-white/10 text-[15px] text-white uppercase font-bold tracking-widest hover:bg-white/80 hover:text-black group transition-all"
+                  className="py-3 flex justify-center items-center gap-2 rounded-lg bg-white/10 border border-white/10 text-[12px] text-white/60 uppercase font-bold tracking-widest hover:bg-white/15 hover:text-white group transition-all"
                 >
-                  Have Account Sign In{" "}
+                  Have Account Login
                   <ArrowRight className="group-hover:translate-x-10 transition-transform duration-300 " />
                 </button>
               </div>
@@ -128,9 +128,7 @@ const Login = () => {
           <div className="w-full max-w-md space-y-8">
             {/* Header */}
             <div>
-              <h1 className="text-4xl font-bold tracking-tight">
-                System Login
-              </h1>
+              <h1 className="text-4xl font-bold tracking-tight">Login</h1>
               <p className="text-white/50 mt-2">
                 Select your access level and credentials.
               </p>
@@ -169,7 +167,7 @@ const Login = () => {
                 <input
                   type="password"
                   required
-                  placeholder="Security Token"
+                  placeholder="Password"
                   className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl focus:border-white/40 focus:ring-1 focus:ring-white/20 transition-all outline-none placeholder:text-white/20"
                   value={data.password}
                   onChange={(e) =>

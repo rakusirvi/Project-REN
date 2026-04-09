@@ -40,7 +40,7 @@ export async function addManager(req, res) {
 
     return res.status(201).json({
       message: "Manager created successfully",
-      manager,
+      data: manager,
     });
   } catch (error) {
     console.error("Add Manager Error:", error);
@@ -53,7 +53,7 @@ export async function getAllManagers(req, res) {
     const managers = await Manager.find({ ceo_id: req.user.id });
     return res.status(200).json({
       message: "Managers fetched successfully",
-      managers,
+      data: managers,
     });
   } catch (error) {
     console.error("Get All Managers Error:", error.message);
