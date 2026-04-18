@@ -1,20 +1,17 @@
 import React from "react";
 import { useAuth } from "../ContextAPI/AuthContext";
+import AdminDashboard from "./DashBoard/AdminDashboard";
+import ManagerDashboard from "./DashBoard/ManagerDashborad";
+import EmployeeDashboard from "./DashBoard/EmployeeDashboard";
 const Home = () => {
   const { user, isAuthenticated, getMe, isLoading, logout } = useAuth();
+
   return (
     <>
-      <div>Home</div>
-
-      <div>
-        <h1>{user.name}</h1>
-        <p>{user.company_email}</p>
-        <p>{user.role}</p>
-      </div>
-
-      <button onClick={() => logout()}>Logout</button>
+      {user.role === "admin" && <AdminDashboard />}
+      {user.role === "manager" && <ManagerDashboard />}
+      {user.role === "employee" && <EmployeeDashboard />}
     </>
   );
 };
-
 export default Home;

@@ -1,7 +1,7 @@
 import React from "react";
 
-const ManagerTeamView = () => {
+const ManagerDashboard = () => {
   return <div>ManagerTeamView</div>;
 };
 
-export default ManagerTeamView;
+export default ManagerDashboard;

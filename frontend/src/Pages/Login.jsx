@@ -20,7 +20,6 @@ const Login = () => {
     <div className="flex h-screen w-full bg-[#0a0a0a] text-white overflow-hidden font-sans">
       {/* LEFT SECTION: BRAND & DOODLES */}
       <div className="hidden lg:flex w-1/2 flex-col justify-center relative border-r border-white/5">
-        {/* Animated Background Doodles (SVG Pattern) */}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
           <svg width="100%" height="100%">
             <pattern
@@ -41,7 +40,7 @@ const Login = () => {
           <img
             src={REN_LOGO}
             alt="REN Logo"
-            className="w-80  h-auto drop-shadow-[0_0_30px_rgba(255,255,255,0.15)] "
+            className="w-80  h-auto drop-shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:drop-shadow-[0_0_30px_rgba(255,255,255,0.45)] transition-all duration-300 "
           />
         </div>
       </div>
