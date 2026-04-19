@@ -2,8 +2,10 @@ import React, { useContext, useState } from "react";
 import API from "../api";
 import toast from "react-hot-toast";
 
-const AdminContext = () => {
-  const [managers, setManager] = useState();
+const AdminContext = createContext();
+
+export const AdminProvider = ({ children }) => {
+  const [managers, setManager] = useState([]);
 
   const getManagers = async () => {
     try {

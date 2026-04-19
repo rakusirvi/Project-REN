@@ -1,7 +1,9 @@
 import { useState, createContext, useContext } from "react";
 import toast from "react-hot-toast";
 import API, { setToken, clearToken } from "../api";
+
 const AuthContext = createContext();
+
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);

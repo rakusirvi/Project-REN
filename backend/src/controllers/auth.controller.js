@@ -111,7 +111,7 @@ export async function AdminAuthenticate(req, res) {
     return res.status(200).json({
       message: "OTP verified successfully",
       accessToken,
-      data: admin ,
+      data: admin,
     });
   } catch (error) {
     console.error(error);
@@ -370,10 +370,7 @@ export async function ManagerAuthenticate(req, res) {
 export async function ManagerSetPassword(req, res) {
   const { password, confirmPassword } = req.body;
   try {
-    const manager = await Manager.findOne({
-      _id: req.user.id,
-      email: req.user.email,
-    });
+    const manager = await Manager.findById(req.user.id);
 
     if (!manager) return res.status(404).json({ message: "Manager not found" });
 

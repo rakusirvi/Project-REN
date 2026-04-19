@@ -50,7 +50,7 @@ export async function addManager(req, res) {
 
 export async function getAllManagers(req, res) {
   try {
-    const managers = await Manager.find({ ceo_id: req.user.id });
+    const managers = await Manager.find({ admin_id: req.user.id });
     return res.status(200).json({
       message: "Managers fetched successfully",
       data: managers,
