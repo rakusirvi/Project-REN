@@ -2,6 +2,7 @@ import { generateJoiningToken, getJoiningTokenHTML } from "../Libs/libs.js";
 import Manager from "../models/manager.model.js";
 import sendEmail from "../services/emailService.js";
 import bcrypt from "bcrypt";
+import Employee from "../models/employee.model.js";
 
 //DONE
 export async function addManager(req, res) {
@@ -113,6 +114,25 @@ export async function deleteManager(req, res) {
     });
   } catch (error) {
     console.error("Delete Manager Error:", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function getManagerEmployee(req, res) {
+  try {
+    const { id } = req.params;
+    const ManagerId = id;
+
+    const employees = await Employee.find({
+      admin_id: req.user.id,
+      manager_id: id,
+    });
+    return res.status(200).json({
+      message: "Employees fetched successfully",
+      data: employees,
+    });
+  } catch (error) {
+    console.error("Get Manager Employee Error:", error.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
