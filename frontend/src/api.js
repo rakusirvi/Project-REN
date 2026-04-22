@@ -1,14 +1,16 @@
 // api.js
 import axios from "axios";
 
-let accessToken = null;
+let accessToken = localStorage.getItem("accessToken") || null;
 
 export const setToken = (token) => {
   accessToken = token;
+  localStorage.setItem("accessToken", token);
 };
 
 export const clearToken = () => {
   accessToken = null;
+  localStorage.removeItem("accessToken");
 };
 
 const API = axios.create({

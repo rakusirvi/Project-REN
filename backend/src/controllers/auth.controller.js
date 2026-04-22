@@ -217,6 +217,7 @@ export async function ReloadToken(req, res) {
       const payload = {
         id: user._id,
         role: user.role,
+        company_name: user.company_name,
       };
 
       const newAccessToken = jwt.sign(payload, config.JWT_SECRET, {

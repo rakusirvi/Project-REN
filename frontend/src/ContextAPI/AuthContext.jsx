@@ -4,7 +4,6 @@ import API, { setToken, clearToken } from "../api";
 
 const AuthContext = createContext();
 
-
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +82,14 @@ export const AuthContextProvider = ({ children }) => {
       return false; // Failure
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const setPassword = async (role, data) => {
+    try {
+      const res = await API.post(`/auth/${role}/set-password`, data);
+    } catch (error) {
+      console.log(error.message);
     }
   };
 

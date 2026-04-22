@@ -19,12 +19,10 @@ export async function addManager(req, res) {
     const joiningToken = generateJoiningToken();
     const joiningTokenHash = await bcrypt.hash(joiningToken, 10);
 
-    // 3. Create the Manager
-    // NOTE: Changed 'company' to 'company_name' to match your JWT logic
     const manager = await Manager.create({
       admin_id: req.user.id,
       name: name,
-      company_name: req.user.company_name, // Pulls from the Admin's JWT
+      company_name: req.user.company_name,
       email: email,
       type: type,
       joiningTokenHash: joiningTokenHash,
@@ -40,12 +38,14 @@ export async function addManager(req, res) {
     }
 
     return res.status(201).json({
-      message: "Manager created successfully",
+      message: "Manager created, Joining Token sent",
       data: manager,
     });
   } catch (error) {
     console.error("Add Manager Error:", error);
-    return res.status(500).json({ message: error });
+    return res.status(500).json({
+      message: error.message || "Internal Server Error",
+    });
   }
 }
 
@@ -57,7 +57,6 @@ export async function getAllManagers(req, res) {
       data: managers,
     });
   } catch (error) {
-    console.error("Get All Managers Error:", error.message);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
@@ -127,12 +126,20 @@ export async function getManagerEmployee(req, res) {
       admin_id: req.user.id,
       manager_id: id,
     });
+
+    if (employees.length === 0 || !employees) {
+      return res.status(200).json({
+        message: "No employees found",
+        data: [],
+      });
+    }
+    console.log(employees);
+
     return res.status(200).json({
       message: "Employees fetched successfully",
       data: employees,
     });
   } catch (error) {
     console.error("Get Manager Employee Error:", error.message);
-    return res.status(500).json({ message: "Internal Server Error" });
   }
 }

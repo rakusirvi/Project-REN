@@ -18,7 +18,6 @@ export const authMiddleware = (req, res, next) => {
 
     next();
   } catch (error) {
-    // If the token is expired, send 401 so the frontend knows to call /ReloadToken
     if (error.name === "TokenExpiredError") {
       return res
         .status(401)
