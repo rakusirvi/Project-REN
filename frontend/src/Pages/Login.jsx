@@ -9,11 +9,22 @@ const Login = () => {
   const [data, setData] = useState({ email: "", password: "" });
   const [role, setRole] = useState("admin");
   const [joinUsingkey, setJoinUsingkey] = useState(false);
+  const [step, setStep] = useState(1);
   const { login } = useAuth();
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleLogin = (e) => {
     e.preventDefault();
     login(data, role);
+  };
+
+  const handleJoinUsingKey = () => {
+    if (step === 1) {
+      setStep(2);
+    } else if (step === 2) {
+      // set new Password
+    }
   };
 
   return (
@@ -49,70 +60,134 @@ const Login = () => {
         <div className="w-full lg:w-1/2 flex items-center justify-center p-6 md:p-12 bg-[#0f0f0f]">
           <div className="w-full max-w-md space-y-8">
             {/* Header */}
-            <div>
-              <h1 className="text-4xl font-bold tracking-tight">
-                Join Using Key
-              </h1>
-              <p className="text-white/50 mt-2">
-                Select your access level and credentials.
-              </p>
-            </div>
 
-            {/* Role Selection Tabs */}
-            <div className="flex p-1 bg-white/5 rounded-xl border border-white/10">
-              {["manager", "employee"].map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setRole(r)}
-                  className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-lg transition-all ${
-                    role === r
-                      ? "bg-white text-black shadow-lg"
-                      : "text-white/40 hover:text-white"
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
+            {step == 1 && (
+              <>
+                <div>
+                  <h1 className="text-4xl font-bold tracking-tight">
+                    Join Using Key
+                  </h1>
+                  <p className="text-white/50 mt-2">
+                    Select your access level and credentials.
+                  </p>
+                </div>
+                <div className="flex p-1 bg-white/5 rounded-xl border border-white/10">
+                  {["manager", "employee"].map((r) => (
+                    <button
+                      key={r}
+                      onClick={() => setRole(r)}
+                      className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-widest rounded-lg transition-all ${
+                        role === r
+                          ? "bg-white text-black shadow-lg"
+                          : "text-white/40 hover:text-white"
+                      }`}
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-1">
+                    <input
+                      type="email"
+                      required
+                      placeholder="Enter Valid Mail"
+                      className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl focus:border-white/40 focus:ring-1 focus:ring-white/20 transition-all outline-none placeholder:text-white/20"
+                      value={data.email}
+                      onChange={(e) =>
+                        setData({ ...data, email: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <input
+                      type="password"
+                      required
+                      placeholder="Security Token"
+                      className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl focus:border-white/40 focus:ring-1 focus:ring-white/20 transition-all outline-none placeholder:text-white/20"
+                      value={data.password}
+                      onChange={(e) =>
+                        setData({ ...data, password: e.target.value })
+                      }
+                    />
+                  </div>
 
-            {/* Form */}
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-1">
-                <input
-                  type="email"
-                  required
-                  placeholder="Enter Valid Mail"
-                  className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl focus:border-white/40 focus:ring-1 focus:ring-white/20 transition-all outline-none placeholder:text-white/20"
-                  value={data.email}
-                  onChange={(e) => setData({ ...data, email: e.target.value })}
-                />
-              </div>
-              <div className="space-y-1">
-                <input
-                  type="password"
-                  required
-                  placeholder="Security Token"
-                  className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl focus:border-white/40 focus:ring-1 focus:ring-white/20 transition-all outline-none placeholder:text-white/20"
-                  value={data.password}
-                  onChange={(e) =>
-                    setData({ ...data, password: e.target.value })
-                  }
-                />
-              </div>
+                  <div></div>
 
-              <button
-                type="submit"
-                className="w-full py-4 bg-white text-black font-black uppercase tracking-tighter rounded-xl hover:bg-slate-200 transition-transform active:scale-[0.98] shadow-[0_0_20px_rgba(255,255,255,0.1)]"
-              >
-                Verify {role}
-              </button>
-            </form>
+                  <button
+                    type="submit"
+                    onClick={handleJoinUsingKey}
+                    className="w-full py-4 bg-white text-black font-black uppercase tracking-tighter rounded-xl hover:bg-slate-200 transition-transform active:scale-[0.98] shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                  >
+                    Verify {role}
+                  </button>
+                </form>
+              </>
+            )}
 
-            {/* Footer Navigation */}
+            {step == 2 && (
+              <>
+                <div>
+                  <h1 className="text-4xl font-bold tracking-tight">
+                    Set New Password
+                  </h1>
+                  <p className="text-white/50 mt-2">
+                    Set your new password for this account
+                  </p>
+                </div>
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-1">
+                    <input
+                      type="password"
+                      required
+                      placeholder="Enter New Password"
+                      className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl focus:border-white/40 focus:ring-1 focus:ring-white/20 transition-all outline-none placeholder:text-white/20"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <input
+                      type="password"
+                      required
+                      placeholder="Confirm Password"
+                      className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl focus:border-white/40 focus:ring-1 focus:ring-white/20 transition-all outline-none placeholder:text-white/20"
+                      value={confirmPassword}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                      }}
+                    />
+                    {password &&
+                      confirmPassword &&
+                      password !== confirmPassword && (
+                        <p className="text-red-500 text-center">
+                          Passwords do not match
+                        </p>
+                      )}
+                  </div>
+
+                  <div></div>
+
+                  <button
+                    type="submit"
+                    onClick={handleJoinUsingKey}
+                    disabled={password !== confirmPassword}
+                    className="w-full py-4 bg-white text-black font-black uppercase tracking-tighter rounded-xl hover:bg-slate-200 transition-transform active:scale-[0.98] shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                  >
+                    {step == 1 ? <>Verify {role}</> : <>Set New Password</>}
+                  </button>
+                </form>
+              </>
+            )}
+
             <div className="pt-8 border-t border-white/5 space-y-6">
               <div className="grid grid-cols-1 gap-3">
                 <button
-                  onClick={() => setJoinUsingkey(false)}
+                  onClick={() =>
+                    joinUsingkey
+                      ? (setJoinUsingkey(false), setStep(1))
+                      : setJoinUsingkey(true)
+                  }
                   className="py-3 flex justify-center items-center gap-2 rounded-lg bg-white/10 border border-white/10 text-[12px] text-white/60 uppercase font-bold tracking-widest hover:bg-white/15 hover:text-white group transition-all"
                 >
                   Have Account Login
@@ -150,7 +225,6 @@ const Login = () => {
               ))}
             </div>
 
-            {/* Form */}
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-1">
                 <input
