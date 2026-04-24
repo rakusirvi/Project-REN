@@ -91,6 +91,82 @@ const Login = ({ navigation }: { navigation: any }) => {
           </View>
         </>
       )}
+
+      {state === 'Token' && (
+        <>
+          <View style={styles.roleContainer}>
+            {['Manager', 'Employee'].map((r, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  setRole(r);
+                }}
+                style={[styles.roleToken, role === r && styles.roleActive]}
+                activeOpacity={0.3}
+              >
+                <Text
+                  style={[styles.roleText, role === r && styles.roleActiveText]}
+                >
+                  {r}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <Text style={styles.selectRoleText}>Select Role</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={[styles.input]}
+              placeholder="Enter Email"
+              placeholderTextColor="#666"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              returnKeyType="next"
+              blurOnSubmit={false}
+            />
+            <TextInput
+              style={[styles.input]}
+              placeholder="Enter Token"
+              placeholderTextColor="#666"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              returnKeyType="next"
+              blurOnSubmit={false}
+            />
+            <TouchableOpacity
+              onPress={() => {
+                setState('PasswordChange');
+              }}
+              style={styles.loginButton}
+            >
+              <Text style={styles.loginButtonText}>Join as {role}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setState('Login');
+              }}
+              style={styles.BackToLoginButton}
+            >
+              <Text style={styles.BackToLoginButtonText}>Back to Login</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+
+      {state === 'PasswordChange' && (
+        <>
+          <Text>Change Password</Text>
+          <TouchableOpacity
+            onPress={() => {
+              setState('Login');
+            }}
+            style={styles.BackToLoginButton}
+          >
+            <Text style={styles.BackToLoginButtonText}>Back to Login</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </SafeAreaView>
   );
 };
@@ -146,6 +222,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
   },
+  roleToken: {
+    width: '50%',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
   roleActive: {
     backgroundColor: '#ffff',
     borderRadius: 10,
@@ -187,6 +268,22 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'transparent',
+  },
+
+  BackToLoginButton: {
+    marginTop: 60,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'white',
+  },
+
+  BackToLoginButtonText: {
+    color: 'white',
+    fontWeight: 700,
+    fontSize: 17,
+    textAlign: 'center',
   },
 
   loginButtonText: {

@@ -148,7 +148,6 @@ const SignUp = ({ navigation }: { navigation: any }) => {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
       >
         <ScrollView
           contentContainerStyle={styles.scroll}
