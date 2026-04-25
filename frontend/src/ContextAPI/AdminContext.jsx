@@ -7,6 +7,7 @@ const AdminContext = createContext();
 export const AdminProvider = ({ children }) => {
   const [managers, setManager] = useState([]);
   const [managerEmployess, setManagerEmployess] = useState([]);
+  const [pendingManagers, setPendingManagers] = useState([]);
 
   const getManagers = async () => {
     try {
@@ -57,6 +58,16 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  const getPendingManagers = async () => {
+    try {
+      const res = await API.get("/admin/get-pending-managers");
+      console.log("list of pending manager:", res.data.data);
+      setPendingManagers(res.data.data);
+    } catch (error) {
+      console.error("Fetch Managers Error:", error);
+    }
+  };
+
   return (
     <AdminContext.Provider
       value={{
@@ -66,6 +77,8 @@ export const AdminProvider = ({ children }) => {
         managerEmployess,
         getManagerEmployess,
         DeleteManager,
+        pendingManagers,
+        getPendingManagers,
       }}
     >
       {children}

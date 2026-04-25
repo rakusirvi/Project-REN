@@ -3,7 +3,14 @@ import React, { useState, useEffect } from "react";
 import { useAdmin } from "../../ContextAPI/AdminContext";
 import ManagerCard from "./ManagerCard";
 export default function ManagersContent() {
-  const { AddManager, getManagers, managers, employees } = useAdmin();
+  const {
+    AddManager,
+    getManagers,
+    managers,
+    employees,
+    pendingManagers,
+    getPendingManagers,
+  } = useAdmin();
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", type: "" });
 
@@ -18,6 +25,7 @@ export default function ManagersContent() {
 
   useEffect(() => {
     getManagers();
+    getPendingManagers();
   }, []);
 
   return (
@@ -159,6 +167,12 @@ export default function ManagersContent() {
         <div className="w-full">
           <hr className="border-white/5" />
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+        {pendingManagers?.map((m) => (
+          <ManagerCard key={m._id} m={m} />
+        ))}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useAdmin } from "../../ContextAPI/AdminContext";
 import API from "../../api";
+import { timeFormatter } from "../../Libs/lib";
 
 export default function ManagerCard({ m }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -89,6 +90,12 @@ export default function ManagerCard({ m }) {
                 <Edit2 size={14} className="text-blue-400" /> EDIT PROFILE
               </button>
               <button
+                onClick={() => {}}
+                className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-medium text-white/70 hover:bg-white/5 transition-colors border-b border-white/5"
+              >
+                <Users size={14} className="text-blue-400" /> Resend Token
+              </button>
+              <button
                 onClick={() => {
                   DeleteManager(m._id);
                 }}
@@ -102,34 +109,39 @@ export default function ManagerCard({ m }) {
       </div>
 
       {/* Role Tag */}
-      <div className="mb-6">
+      <div className="mb-6 flex gap-2">
         <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold text-white/80 uppercase tracking-wider bg-white/5 border border-white/10">
           {m.type}
+        </span>
+        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold text-white/80 uppercase tracking-wider bg-white/5 border border-white/10">
+          {timeFormatter(m.createdAt)}
         </span>
       </div>
 
       {/* Stats / Footer Toggle */}
-      <button
-        onClick={() => setModel(true)}
-        className="w-full flex items-center justify-between pt-4 border-t border-white/5 group/btn"
-      >
-        <div className="flex items-center gap-2 text-white/40 group-hover/btn:text-white/70 transition-colors">
-          <div className="p-1.5 rounded-lg bg-white/5">
-            <Users size={12} />
+      {m.verified && (
+        <button
+          onClick={() => setModel(true)}
+          className="w-full flex items-center justify-between pt-4 border-t border-white/5 group/btn"
+        >
+          <div className="flex items-center gap-2 text-white/40 group-hover/btn:text-white/70 transition-colors">
+            <div className="p-1.5 rounded-lg bg-white/5">
+              <Users size={12} />
+            </div>
+            <div className="flex gap-2 items-center">
+              <span className="text-[15px] font-bold text-white/90">
+                {noOfEmployees}
+              </span>
+              <span className="text-[10px] text-white/70 uppercase tracking-tighter">
+                Employees
+              </span>
+            </div>
           </div>
-          <div className="flex gap-2 items-center">
-            <span className="text-[15px] font-bold text-white/90">
-              {noOfEmployees}
-            </span>
-            <span className="text-[10px] text-white/70 uppercase tracking-tighter">
-              Employees
-            </span>
+          <div className="text-[10px] font-bold text-blue-400 opacity-0 group-hover/btn:opacity-100 transition-all translate-x-2 group-hover/btn:translate-x-0">
+            VIEW LIST →
           </div>
-        </div>
-        <div className="text-[10px] font-bold text-blue-400 opacity-0 group-hover/btn:opacity-100 transition-all translate-x-2 group-hover/btn:translate-x-0">
-          VIEW LIST →
-        </div>
-      </button>
+        </button>
+      )}
 
       {model && (
         <div
@@ -157,13 +169,20 @@ export default function ManagerCard({ m }) {
             <div className="p-4 overflow-y-scroll max-h-96 text-white/20 italic">
               {employees &&
                 employees?.map((em) => (
-                  <div className="py-4 flex  border-b gap-6 items-center" key={em._id || em.email}>
+                  <div
+                    className="py-4 flex  border-b gap-6 items-center"
+                    key={em._id || em.email}
+                  >
                     <span className="h-10 w-10 flex justify-center items-center text-center text-lg font-bold border border-white/10 rounded-full bg-white/5">
                       {initials(em)}
                     </span>
                     <div className="flex flex-col gap-1">
-                      <span className="text-white text-sm not-italic font-semibold">{em.name}</span>
-                      <span className="text-white/60 text-xs not-italic">{em.email}</span>
+                      <span className="text-white text-sm not-italic font-semibold">
+                        {em.name}
+                      </span>
+                      <span className="text-white/60 text-xs not-italic">
+                        {em.email}
+                      </span>
                     </div>
                   </div>
                 ))}
