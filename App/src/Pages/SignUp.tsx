@@ -4,7 +4,6 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,9 +11,12 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  Dimensions,
 } from 'react-native';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 const REN = require('../../assets/ren_logo_white.png');
+
+const { width, height } = Dimensions.get('window');
 
 interface FormData {
   name: string;
@@ -146,8 +148,13 @@ const SignUp = ({ navigation }: { navigation: any }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <View style={styles.background}>
+        <View style={styles.circle1} />
+        <View style={styles.circle2} />
+      </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
       >
         <ScrollView
           contentContainerStyle={styles.scroll}
@@ -169,7 +176,9 @@ const SignUp = ({ navigation }: { navigation: any }) => {
                   styles.stepDot,
                   {
                     backgroundColor:
-                      step >= s ? '#fff' : 'rgba(255,255,255,0.15)',
+                      step >= s
+                        ? 'rgba(255,255,255,0.9)'
+                        : 'rgba(255,255,255,0.2)',
                   },
                 ]}
               />
@@ -182,131 +191,137 @@ const SignUp = ({ navigation }: { navigation: any }) => {
             <Text style={styles.subtitle}>{stepSubtitle}</Text>
           </View>
 
-          {/* Animated Form Fields */}
-          <Animated.View
-            style={[
-              styles.formContainer,
-              { opacity: fadeAnim, transform: [{ translateX: slideAnim }] },
-            ]}
-          >
-            {/* Step 1 */}
-            {step === 1 && (
-              <View style={styles.fields}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Full Name"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
-                  value={formData.name}
-                  onChangeText={v => handleChange('name', v)}
-                  autoCapitalize="words"
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Contact Number"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
-                  value={formData.phone}
-                  onChangeText={v => handleChange('phone', v)}
-                  keyboardType="phone-pad"
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Secure Password"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
-                  value={formData.password}
-                  onChangeText={v => handleChange('password', v)}
-                  secureTextEntry
-                />
-                <TextInput
-                  style={[styles.input, isMismatch && styles.inputError]}
-                  placeholder="Confirm Password"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  secureTextEntry
-                />
-                {isMismatch && (
-                  <Text style={styles.errorText}>* Passwords do not match</Text>
-                )}
-              </View>
-            )}
-
-            {/* Step 2 */}
-            {step === 2 && (
-              <View style={styles.fields}>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Company Legal Name"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
-                  value={formData.company_name}
-                  onChangeText={v => handleChange('company_name', v)}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Official Company Email"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
-                  value={formData.company_email}
-                  onChangeText={v => handleChange('company_email', v)}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Headquarters Location"
-                  placeholderTextColor="rgba(255,255,255,0.3)"
-                  value={formData.company_location}
-                  onChangeText={v => handleChange('company_location', v)}
-                />
-              </View>
-            )}
-
-            {/* Step 3 — OTP */}
-            {step === 3 && (
-              <View style={styles.otpContainer}>
-                <TextInput
-                  style={styles.otpInput}
-                  placeholder="000000"
-                  placeholderTextColor="rgba(255,255,255,0.2)"
-                  value={verificationOtp}
-                  onChangeText={v => setVerificationOtp(v.replace(/\D/g, ''))}
-                  keyboardType="number-pad"
-                  maxLength={6}
-                />
-                <TouchableOpacity onPress={() => Alert.alert('Code Resent')}>
-                  <Text style={styles.resendText}>RESEND SECURITY TOKEN</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </Animated.View>
-
-          {/* Buttons */}
-          <View style={styles.buttonRow}>
-            {step > 1 && (
-              <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-                <Text style={styles.backArrow}>←</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity
+          <View style={styles.glassCard}>
+            {/* Animated Form Fields */}
+            <Animated.View
               style={[
-                styles.nextButton,
-                isLoading && styles.nextButtonDisabled,
+                styles.formContainer,
+                { opacity: fadeAnim, transform: [{ translateX: slideAnim }] },
               ]}
-              onPress={handleNext}
-              disabled={isLoading}
-              activeOpacity={0.85}
             >
-              <Text style={styles.nextButtonText}>
-                {isLoading ? '...' : stepLabel}
-              </Text>
+              {/* Step 1 */}
+              {step === 1 && (
+                <View style={styles.fields}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Full Name"
+                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    value={formData.name}
+                    onChangeText={v => handleChange('name', v)}
+                    autoCapitalize="words"
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Contact Number"
+                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    value={formData.phone}
+                    onChangeText={v => handleChange('phone', v)}
+                    keyboardType="phone-pad"
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Secure Password"
+                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    value={formData.password}
+                    onChangeText={v => handleChange('password', v)}
+                    secureTextEntry
+                  />
+                  <TextInput
+                    style={[styles.input, isMismatch && styles.inputError]}
+                    placeholder="Confirm Password"
+                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry
+                  />
+                  {isMismatch && (
+                    <Text style={styles.errorText}>
+                      * Passwords do not match
+                    </Text>
+                  )}
+                </View>
+              )}
+
+              {/* Step 2 */}
+              {step === 2 && (
+                <View style={styles.fields}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Company Legal Name"
+                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    value={formData.company_name}
+                    onChangeText={v => handleChange('company_name', v)}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Official Company Email"
+                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    value={formData.company_email}
+                    onChangeText={v => handleChange('company_email', v)}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Headquarters Location"
+                    placeholderTextColor="rgba(255,255,255,0.3)"
+                    value={formData.company_location}
+                    onChangeText={v => handleChange('company_location', v)}
+                  />
+                </View>
+              )}
+
+              {/* Step 3 — OTP */}
+              {step === 3 && (
+                <View style={styles.otpContainer}>
+                  <TextInput
+                    style={styles.otpInput}
+                    placeholder="000000"
+                    placeholderTextColor="rgba(255,255,255,0.2)"
+                    value={verificationOtp}
+                    onChangeText={v => setVerificationOtp(v.replace(/\D/g, ''))}
+                    keyboardType="number-pad"
+                    maxLength={6}
+                  />
+                  <TouchableOpacity onPress={() => Alert.alert('Code Resent')}>
+                    <Text style={styles.resendText}>RESEND SECURITY TOKEN</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </Animated.View>
+
+            {/* Buttons */}
+            <View style={styles.buttonRow}>
+              {step > 1 && (
+                <TouchableOpacity
+                  style={styles.backButton}
+                  onPress={handleBack}
+                >
+                  <Text style={styles.backArrow}>←</Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                style={[
+                  styles.nextButton,
+                  isLoading && styles.nextButtonDisabled,
+                ]}
+                onPress={handleNext}
+                disabled={isLoading}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.nextButtonText}>
+                  {isLoading ? '...' : stepLabel}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => navigation.navigate('Login')}
+            >
+              <Text style={styles.loginText}>BACK TO LOGIN →</Text>
             </TouchableOpacity>
           </View>
-
-          {/* Footer */}
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => navigation.navigate('Login')}
-          >
-            <Text style={styles.loginText}>BACK TO LOGIN →</Text>
-          </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -316,12 +331,50 @@ const SignUp = ({ navigation }: { navigation: any }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: '#050505',
+  },
+  background: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  circle1: {
+    position: 'absolute',
+    top: -height * 0.15,
+    left: -width * 0.2,
+    width: width * 0.8,
+    height: width * 0.8,
+    borderRadius: width * 0.4,
+    backgroundColor: 'rgba(99, 102, 241, 0.95)',
+    transform: [{ scaleX: 1.2 }],
+  },
+  circle2: {
+    position: 'absolute',
+    bottom: -height * 0.05,
+    right: -width * 0.2,
+    width: width * 0.8,
+    height: width * 0.8,
+    borderRadius: width * 0.4,
+    backgroundColor: 'rgba(236, 72, 153, 0.95)',
+  },
+  glassCard: {
+    backgroundColor: 'rgba(0, 0, 0, 0.80)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 24,
+    padding: 20,
+    shadowColor: '#666',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 5,
   },
   scroll: {
     marginTop: 10,
     flexGrow: 1,
-    paddingHorizontal: 28,
+    paddingHorizontal: 18,
     paddingTop: 20,
     paddingBottom: 40,
   },
@@ -329,7 +382,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    marginBottom: 32,
+    marginBottom: 24,
   },
   logo: {
     width: 50,
@@ -344,7 +397,7 @@ const styles = StyleSheet.create({
   stepIndicators: {
     flexDirection: 'row',
     gap: 6,
-    marginBottom: 32,
+    marginBottom: 24,
   },
   stepDot: {
     height: 6,
@@ -352,7 +405,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   header: {
-    marginBottom: 36,
+    marginBottom: 20,
   },
   title: {
     color: '#fff',
@@ -363,9 +416,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subtitle: {
-    color: 'rgba(255,255,255,0.45)',
-    fontSize: 14,
-    lineHeight: 20,
+    color: 'rgba(255,255,255,0.55)',
+    fontSize: 15,
+    lineHeight: 22,
     marginBottom: 10,
   },
   formContainer: {
@@ -375,10 +428,10 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 10,
+    borderColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 15,
     color: '#fff',
@@ -399,7 +452,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   otpInput: {
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)',
     borderRadius: 18,
@@ -413,7 +466,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   resendText: {
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.6)',
     fontSize: 11,
     letterSpacing: 3,
     fontWeight: '700',
@@ -427,8 +480,8 @@ const styles = StyleSheet.create({
     width: 60,
     backgroundColor: 'rgba(255,255,255,0.05)',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 14,
+    borderColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -438,11 +491,16 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 16,
     paddingVertical: 18,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#fff',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
   },
   nextButtonDisabled: {
     opacity: 0.6,
@@ -455,15 +513,16 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 12,
+    borderColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 16,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 8,
   },
   loginText: {
-    color: 'rgba(255,255,255,0.4)',
-    fontSize: 11,
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
     fontWeight: '700',
     letterSpacing: 3,
   },

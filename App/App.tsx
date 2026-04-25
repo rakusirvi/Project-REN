@@ -3,7 +3,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // 1. Import your Provider and Hook
-import { AuthContextProvider, useAuth } from './src/Context/authContext';
+import { AuthContextProvider } from './src/Context/authContext';
+// import { useAuth } from './src/Context/authContext';
 
 import Home from './src/Pages/Home';
 import Login from './src/Pages/Login';
@@ -14,9 +15,10 @@ const Stack = createNativeStackNavigator();
 
 // 2. Create a separate component for the actual navigation logic
 const RootNavigator = () => {
-  // Now this works because it's a child of AuthContextProvider!
-  const { isAuthenticated, isLoading, user } = useAuth();
-
+  // const { isAuthenticated, isLoading, user } = useAuth();
+  const isAuthenticated = true;
+  const isLoading = false;
+  const user = true;
   if (isLoading) {
     return <Loader />;
   }

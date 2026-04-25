@@ -19,8 +19,10 @@
     "react-native-config": "^1.6.1",
     "react-native-mmkv": "^4.3.1",
     "react-native-nitro-modules": "^0.35.5",
+    "react-native-pager-view": "^8.0.1",
     "react-native-safe-area-context": "^5.7.0",
-    "react-native-screens": "^4.24.0"
+    "react-native-screens": "^4.24.0",
+    "react-native-tab-view": "^4.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
