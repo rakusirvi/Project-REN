@@ -9,11 +9,13 @@ import {
   Dice1,
 } from "lucide-react";
 import { useAdmin } from "../../ContextAPI/AdminContext";
+import API from "../../api";
 
 export default function ManagerCard({ m }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [model, setModel] = useState(false);
-  const { DeleteManager, getManagerEmployess, managerEmployess } = useAdmin();
+  const { DeleteManager } = useAdmin();
+  const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -23,13 +25,25 @@ export default function ManagerCard({ m }) {
   }, [menuOpen]);
 
   useEffect(() => {
-    getManagerEmployess(m._id);
-  }, [m]);
+    const fetchEmployees = async () => {
+      try {
+        const res = await API.get(`/admin/getManagerEmployee/${m._id}`);
+        if (res.data.data) {
+          setEmployees(res.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    };
+    if (m?._id) {
+      fetchEmployees();
+    }
+  }, [m?._id]);
 
-  const noOfEmployees = managerEmployess?.length || 0;
+  const noOfEmployees = employees?.length || 0;
 
-  const initials =
-    m.name
+  const initials = (val) =>
+    val?.name
       ?.split(" ")
       .map((n) => n[0])
       .join("")
@@ -43,7 +57,7 @@ export default function ManagerCard({ m }) {
         <div className="flex gap-4 items-center min-w-0">
           {/* Enhanced Avatar */}
           <div className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold shrink-0 bg-gradient-to-br from-white/10 to-white/[0.02] border border-white/10 text-white shadow-inner">
-            {initials}
+            {initials(m)}
           </div>
 
           <div className="min-w-0">
@@ -141,17 +155,25 @@ export default function ManagerCard({ m }) {
               </button>
             </div>
             <div className="p-4 overflow-y-scroll max-h-96 text-white/20 italic">
-              {managerEmployess?.map((m) => (
-                <div className="py-4 flex  border-b gap-6 items-center">
-                  <span className="h-10 w-10 text-center text-2xl border rounded-full ">
-                    R
-                  </span>
-                  <div className="flex flex-col gap-2">
-                    <span className="text-white">{m.name}</span>
-                    <span className="text-white/60">{m.email}</span>
+              {employees &&
+                employees?.map((em) => (
+                  <div className="py-4 flex  border-b gap-6 items-center" key={em._id || em.email}>
+                    <span className="h-10 w-10 flex justify-center items-center text-center text-lg font-bold border border-white/10 rounded-full bg-white/5">
+                      {initials(em)}
+                    </span>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-white text-sm not-italic font-semibold">{em.name}</span>
+                      <span className="text-white/60 text-xs not-italic">{em.email}</span>
+                    </div>
                   </div>
+                ))}
+              {employees?.length === 0 && (
+                <div className="flex items-center justify-center h-40">
+                  <p className="text-white/30 font-black text-lg not-italic">
+                    No Employees Yet
+                  </p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>

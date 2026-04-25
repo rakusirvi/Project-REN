@@ -51,9 +51,27 @@ export async function addManager(req, res) {
 
 export async function getAllManagers(req, res) {
   try {
-    const managers = await Manager.find({ admin_id: req.user.id });
+    const managers = await Manager.find({
+      admin_id: req.user.id,
+      verified: true,
+    });
     return res.status(200).json({
       message: "Managers fetched successfully",
+      data: managers,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function getPendingManagers(req, res) {
+  try {
+    const managers = await Manager.find({
+      admin_id: req.user.id,
+      verified: false,
+    });
+    return res.status(200).json({
+      message: "Pending Managers fetched successfully",
       data: managers,
     });
   } catch (error) {

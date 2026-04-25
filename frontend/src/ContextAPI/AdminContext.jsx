@@ -52,7 +52,9 @@ export const AdminProvider = ({ children }) => {
         return;
       }
       setManagerEmployess(res.data.data);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -69,6 +71,7 @@ export const AdminProvider = ({ children }) => {
       {children}
     </AdminContext.Provider>
   );
-};  
+};
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAdmin = () => useContext(AdminContext);

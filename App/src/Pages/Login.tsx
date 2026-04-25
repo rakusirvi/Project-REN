@@ -4,8 +4,11 @@ import {
   Text,
   TextInput,
   StyleSheet,
+  Platform,
   Image,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  ScrollView,
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -34,201 +37,222 @@ const Login = ({ navigation }: { navigation: any }) => {
         <View style={styles.circle1} />
         <View style={styles.circle2} />
       </View>
-      <View style={styles.container}>
-        <Image
-          source={require('../../assets/ren_logo_white.png')}
-          style={{ width: 100, height: 100, borderRadius: 10 }}
-        />
-      </View>
-      <View style={styles.headingContainer}>
-        <Text style={styles.Heading}>{Heading}</Text>
-        <Text style={styles.Heading2}>{SubHeading}</Text>
-      </View>
-      <View style={styles.glassCard}>
-        {state === 'Login' && (
-          <>
-            <View style={styles.roleContainer}>
-              {['Admin', 'Manager', 'Employee'].map((r, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => {
-                    setRole(r);
-                  }}
-                  style={[styles.role, role === r && styles.roleActive]}
-                  activeOpacity={0.3}
-                >
-                  <Text
-                    style={[
-                      styles.roleText,
-                      role === r && styles.roleActiveText,
-                    ]}
+
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.container}>
+            <Image
+              source={require('../../assets/ren_logo_white.png')}
+              style={{ width: 100, height: 100, borderRadius: 10 }}
+            />
+          </View>
+          <View style={styles.headingContainer}>
+            <Text style={styles.Heading}>{Heading}</Text>
+            <Text style={styles.Heading2}>{SubHeading}</Text>
+          </View>
+          <View style={styles.glassCard}>
+            {state === 'Login' && (
+              <>
+                <View style={styles.roleContainer}>
+                  {['Admin', 'Manager', 'Employee'].map((r, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => {
+                        setRole(r);
+                      }}
+                      style={[styles.role, role === r && styles.roleActive]}
+                      activeOpacity={0.3}
+                    >
+                      <Text
+                        style={[
+                          styles.roleText,
+                          role === r && styles.roleActiveText,
+                        ]}
+                      >
+                        {r}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <Text style={styles.selectRoleText}>Select Role</Text>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={[styles.input]}
+                    placeholder="Enter Email Address"
+                    placeholderTextColor="#666"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                  />
+                  <TextInput
+                    style={[styles.input]}
+                    placeholder="Enter Password"
+                    placeholderTextColor="#666"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                    secureTextEntry
+                  />
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.replace('Home');
+                    }}
+                    style={styles.loginButton}
                   >
-                    {r}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <Text style={styles.selectRoleText}>Select Role</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={[styles.input]}
-                placeholder="Enter Email Address"
-                placeholderTextColor="#666"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="next"
-                blurOnSubmit={false}
-              />
-              <TextInput
-                style={[styles.input]}
-                placeholder="Enter Password"
-                placeholderTextColor="#666"
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="next"
-                blurOnSubmit={false}
-                secureTextEntry
-              />
-
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.replace('Home');
-                }}
-                style={styles.loginButton}
-              >
-                <Text style={styles.loginButtonText}>Login as {role}</Text>
-              </TouchableOpacity>
-            </View>
-            {/* ── Divider ── */}
-            <View style={styles.divider}>
-              <View style={styles.divLine} />
-              <Text style={styles.divText}>OR</Text>
-              <View style={styles.divLine} />
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                setState('Token');
-              }}
-              style={styles.ToTokenButton}
-            >
-              <Text style={styles.ToTokenButtonText}>Join Using Token</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('SignUp');
-              }}
-              style={styles.NewToRenButton}
-            >
-              <Text style={styles.NewToRenButtonText}>New to REN</Text>
-            </TouchableOpacity>
-          </>
-        )}
-
-        {state === 'Token' && (
-          <>
-            <View style={styles.roleContainer}>
-              {['Manager', 'Employee'].map((r, index) => (
+                    <Text style={styles.loginButtonText}>Login as {role}</Text>
+                  </TouchableOpacity>
+                </View>
+                {/* ── Divider ── */}
+                <View style={styles.divider}>
+                  <View style={styles.divLine} />
+                  <Text style={styles.divText}>OR</Text>
+                  <View style={styles.divLine} />
+                </View>
                 <TouchableOpacity
-                  key={index}
                   onPress={() => {
-                    setRole(r);
+                    setState('Token');
                   }}
-                  style={[styles.roleToken, role === r && styles.roleActive]}
-                  activeOpacity={0.3}
+                  style={styles.ToTokenButton}
                 >
-                  <Text
-                    style={[
-                      styles.roleText,
-                      role === r && styles.roleActiveText,
-                    ]}
-                  >
-                    {r}
-                  </Text>
+                  <Text style={styles.ToTokenButtonText}>Join Using Token</Text>
                 </TouchableOpacity>
-              ))}
-            </View>
-            <Text style={styles.selectRoleText}>Select Role</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={[styles.input]}
-                placeholder="Enter Email"
-                placeholderTextColor="#666"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="next"
-                blurOnSubmit={false}
-              />
-              <TextInput
-                style={[styles.input]}
-                placeholder="Enter Token"
-                placeholderTextColor="#666"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="next"
-                blurOnSubmit={false}
-              />
-              <TouchableOpacity
-                onPress={() => {
-                  setState('PasswordChange');
-                }}
-                style={styles.loginButton}
-              >
-                <Text style={styles.loginButtonText}>Join as {role}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  setState('Login');
-                }}
-                style={styles.BackToLoginButton}
-              >
-                <Text style={styles.BackToLoginButtonText}>Back to Login</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('SignUp');
+                  }}
+                  style={styles.NewToRenButton}
+                >
+                  <Text style={styles.NewToRenButtonText}>New to REN</Text>
+                </TouchableOpacity>
+              </>
+            )}
 
-        {state === 'PasswordChange' && (
-          <>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={[styles.input]}
-                placeholder="Enter New Password"
-                placeholderTextColor="#666"
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="next"
-                secureTextEntry
-                blurOnSubmit={false}
-              />
-              <TextInput
-                style={[styles.input]}
-                placeholder="Confirm New Password"
-                placeholderTextColor="#666"
-                autoCapitalize="none"
-                autoCorrect={false}
-                returnKeyType="next"
-                secureTextEntry
-                blurOnSubmit={false}
-              />
-              <TouchableOpacity onPress={() => {}} style={styles.loginButton}>
-                <Text style={styles.loginButtonText}>Update Password</Text>
-              </TouchableOpacity>
+            {state === 'Token' && (
+              <>
+                <View style={styles.roleContainer}>
+                  {['Manager', 'Employee'].map((r, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => {
+                        setRole(r);
+                      }}
+                      style={[
+                        styles.roleToken,
+                        role === r && styles.roleActive,
+                      ]}
+                      activeOpacity={0.3}
+                    >
+                      <Text
+                        style={[
+                          styles.roleText,
+                          role === r && styles.roleActiveText,
+                        ]}
+                      >
+                        {r}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <Text style={styles.selectRoleText}>Select Role</Text>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={[styles.input]}
+                    placeholder="Enter Email"
+                    placeholderTextColor="#666"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                  />
+                  <TextInput
+                    style={[styles.input]}
+                    placeholder="Enter Token"
+                    placeholderTextColor="#666"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      setState('PasswordChange');
+                    }}
+                    style={styles.loginButton}
+                  >
+                    <Text style={styles.loginButtonText}>Join as {role}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setState('Login');
+                    }}
+                    style={styles.BackToLoginButton}
+                  >
+                    <Text style={styles.BackToLoginButtonText}>
+                      Back to Login
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
 
-              <TouchableOpacity
-                onPress={() => {
-                  setState('Login');
-                }}
-                style={styles.BackToLoginButton}
-              >
-                <Text style={styles.BackToLoginButtonText}>Back to Login</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
-      </View>
+            {state === 'PasswordChange' && (
+              <>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    style={[styles.input]}
+                    placeholder="Enter New Password"
+                    placeholderTextColor="#666"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    secureTextEntry
+                    blurOnSubmit={false}
+                  />
+                  <TextInput
+                    style={[styles.input]}
+                    placeholder="Confirm New Password"
+                    placeholderTextColor="#666"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    returnKeyType="next"
+                    secureTextEntry
+                    blurOnSubmit={false}
+                  />
+                  <TouchableOpacity
+                    onPress={() => {}}
+                    style={styles.loginButton}
+                  >
+                    <Text style={styles.loginButtonText}>Update Password</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      setState('Login');
+                    }}
+                    style={styles.BackToLoginButton}
+                  >
+                    <Text style={styles.BackToLoginButtonText}>
+                      Back to Login
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -240,6 +264,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#050505',
   },
+
   background: {
     position: 'absolute',
     top: 0,

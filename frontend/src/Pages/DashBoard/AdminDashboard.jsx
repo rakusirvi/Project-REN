@@ -18,6 +18,86 @@ import {
   CalendarOff,
 } from "lucide-react";
 
+// eslint-disable-next-line no-unused-vars
+const SidebarLink = ({ Icon, label, id, activeSection, handleNav }) => (
+  <button
+    onClick={() => handleNav(id)}
+    className={`w-full flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all group ${
+      activeSection === id
+        ? "bg-white/10 text-white shadow-[0_0_20px_rgba(255,255,255,0.02)]"
+        : "text-white/30 hover:text-white/70 hover:bg-white/5"
+    }`}
+  >
+    <Icon
+      size={14}
+      className={`${activeSection === id ? "text-white" : "text-white/20 group-hover:text-white/50"}`}
+    />
+    {label}
+  </button>
+);
+
+const SidebarContent = ({ activeSection, handleNav, user, logout }) => (
+  <>
+    <div className="mb-8 mt-2 px-2">
+      <img
+        src={REN_LOGO}
+        alt="REN"
+        className="w-24 h-auto opacity-90 filter brightness-125"
+      />
+    </div>
+
+    <nav className="space-y-1.5 flex-1">
+      <SidebarLink
+        Icon={BarChart3}
+        label="Dashboard"
+        id="dashboard"
+        activeSection={activeSection}
+        handleNav={handleNav}
+      />
+      <SidebarLink
+        Icon={Users}
+        label="Managers"
+        id="managers"
+        activeSection={activeSection}
+        handleNav={handleNav}
+      />
+      <SidebarLink
+        Icon={CalendarOff}
+        label="Leave"
+        id="leave"
+        activeSection={activeSection}
+        handleNav={handleNav}
+      />
+      <SidebarLink
+        Icon={Settings}
+        label="Settings"
+        id="settings"
+        activeSection={activeSection}
+        handleNav={handleNav}
+      />
+    </nav>
+
+    <div className="pt-4 border-t border-white/5 space-y-3">
+      <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
+        <div className="flex items-center gap-2">
+          <div className="h-6 w-6 rounded bg-white/10 flex items-center justify-center">
+            <ShieldCheck size={12} className="text-green-500" />
+          </div>
+          <span className="text-[10px] font-black uppercase tracking-tighter">
+            {user?.role || "Root"}
+          </span>
+        </div>
+        <button
+          onClick={logout}
+          className="text-white/20 hover:text-red-400 transition-colors"
+        >
+          <LogOut size={14} />
+        </button>
+      </div>
+    </div>
+  </>
+);
+
 const AdminDashboard = () => {
   const { logout, user } = useAuth();
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -28,66 +108,16 @@ const AdminDashboard = () => {
     setSidebarOpen(false);
   };
 
-  const SidebarLink = ({ Icon, label, id }) => (
-    <button
-      onClick={() => handleNav(id)}
-      className={`w-full flex items-center gap-2.5 px-4 py-2.5 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all group ${
-        activeSection === id
-          ? "bg-white/10 text-white shadow-[0_0_20px_rgba(255,255,255,0.02)]"
-          : "text-white/30 hover:text-white/70 hover:bg-white/5"
-      }`}
-    >
-      <Icon
-        size={14}
-        className={`${activeSection === id ? "text-white" : "text-white/20 group-hover:text-white/50"}`}
-      />
-      {label}
-    </button>
-  );
-
-  const SidebarContent = () => (
-    <>
-      <div className="mb-8 mt-2 px-2">
-        <img
-          src={REN_LOGO}
-          alt="REN"
-          className="w-24 h-auto opacity-90 filter brightness-125"
-        />
-      </div>
-
-      <nav className="space-y-1.5 flex-1">
-        <SidebarLink Icon={BarChart3} label="Dashboard" id="dashboard" />
-        <SidebarLink Icon={Users} label="Managers" id="managers" />
-        <SidebarLink Icon={CalendarOff} label="Leave" id="leave" />
-        <SidebarLink Icon={Settings} label="Settings" id="settings" />
-      </nav>
-
-      <div className="pt-4 border-t border-white/5 space-y-3">
-        <div className="flex items-center justify-between p-2 bg-white/5 rounded-lg border border-white/5">
-          <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded bg-white/10 flex items-center justify-center">
-              <ShieldCheck size={12} className="text-green-500" />
-            </div>
-            <span className="text-[10px] font-black uppercase tracking-tighter">
-              {user?.role || "Root"}
-            </span>
-          </div>
-          <button
-            onClick={logout}
-            className="text-white/20 hover:text-red-400 transition-colors"
-          >
-            <LogOut size={14} />
-          </button>
-        </div>
-      </div>
-    </>
-  );
-
   return (
     <div className="flex h-screen w-full bg-[#0a0a0a] text-white/90 overflow-hidden font-sans text-[13px]">
       {/* ── Desktop sidebar ── */}
       <aside className="hidden lg:flex w-[220px] flex-col border-r border-white/5 p-4 bg-[#0f0f0f] z-20">
-        <SidebarContent />
+        <SidebarContent
+          activeSection={activeSection}
+          handleNav={handleNav}
+          user={user}
+          logout={logout}
+        />
       </aside>
 
       {/* ── Mobile overlay backdrop ── */}
@@ -112,7 +142,12 @@ const AdminDashboard = () => {
           <X size={18} />
         </button>
 
-        <SidebarContent />
+        <SidebarContent
+          activeSection={activeSection}
+          handleNav={handleNav}
+          user={user}
+          logout={logout}
+        />
       </aside>
 
       {/* ── Main content ── */}

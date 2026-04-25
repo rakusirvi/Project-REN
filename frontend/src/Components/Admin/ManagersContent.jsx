@@ -3,14 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useAdmin } from "../../ContextAPI/AdminContext";
 import ManagerCard from "./ManagerCard";
 export default function ManagersContent() {
-  const {
-    AddManager,
-    getManagers,
-    managers,
-    employees,
-    getManagerEmployess,
-    managerEmployess,
-  } = useAdmin();
+  const { AddManager, getManagers, managers, employees } = useAdmin();
   const [modal, setModal] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", type: "" });
 
@@ -25,10 +18,8 @@ export default function ManagersContent() {
 
   useEffect(() => {
     getManagers();
-    getManagerEmployess(managers._id);
   }, []);
 
-  
   return (
     <div>
       <div className="grid w-full grid-cols-2 gap-3">
@@ -88,9 +79,7 @@ export default function ManagersContent() {
               </button>
             </div>
 
-            {/* Fields */}
             <div className="space-y-4">
-              {/* Name */}
               <div>
                 <label className="block text-[10px] font-black uppercase tracking-widest text-white/80 mb-1.5">
                   Full Name <span className="text-red-400">*</span>
@@ -159,6 +148,18 @@ export default function ManagersContent() {
           ))}
         </div>
       )}
+
+      <div className="flex mt-10 items-center gap-2">
+        <div className="w-full">
+          <hr className="border-white/5" />
+        </div>
+        <h1 className="text-center font-black text-white/30 w-full text-sm tracking-widest">
+          Non Verified Manager's
+        </h1>
+        <div className="w-full">
+          <hr className="border-white/5" />
+        </div>
+      </div>
     </div>
   );
 }

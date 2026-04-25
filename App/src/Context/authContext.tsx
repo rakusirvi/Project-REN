@@ -9,6 +9,7 @@ interface AuthContextType {
   isLoading: boolean;
   getMe: () => void;
   login: (data: any, role: string) => void;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -46,20 +47,16 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  //   const logout = async () => {
-  //     try {
-  //       await API.post('/auth/logout');
-  //     } catch (error) {
-  //       console.log('Logout API failed');
-  //     }
-
-  //     // always clear
-  //     clearToken();
-  //     setUser(null);
-  //     setIsAuthenticated(false);
-
-  //     toast.success('Logout Successfully');
-  //   };
+  const logout = async () => {
+    try {
+      await API.post('/auth/logout');
+    } catch (error: any) {
+      console.log(error.message);
+    }
+    clearToken();
+    setUser(null);
+    setIsAuthenticated(false);
+  };
 
   //   const signup = async data => {
   //     try {
@@ -107,6 +104,7 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated,
         setIsAuthenticated,
         getMe,
+        logout,
         isLoading,
       }}
     >
@@ -114,6 +112,7 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
     </AuthContext.Provider>
   );
 };
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
 
