@@ -8,15 +8,23 @@ import {
   deleteManager,
   getManagerEmployee,
   getPendingManagers,
+  resendManagerInvitation,
 } from "../controllers/admin.controller.js";
 const AdminRoute = Router();
 
 AdminRoute.post("/add-manager", authMiddleware, addManager);
 AdminRoute.get("/get-all-managers", authMiddleware, getAllManagers);
 AdminRoute.get("/get-pending-managers", authMiddleware, getPendingManagers);
+AdminRoute.post(
+  "/resend-manager-invitation/:id",
+  authMiddleware,
+  resendManagerInvitation,
+);
+
 AdminRoute.get("/getManagerEmployee/:id", authMiddleware, getManagerEmployee);
 AdminRoute.get("/get-manager/:id", authMiddleware, getManagerById);
 AdminRoute.put("/update-manager/:id", authMiddleware, updateManager);
+
 AdminRoute.delete("/delete-manager/:id", authMiddleware, deleteManager);
 
 export default AdminRoute;

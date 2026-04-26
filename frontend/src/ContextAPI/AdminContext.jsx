@@ -68,6 +68,15 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  const resendManagerInvitation = async (id) => {
+    try {
+      const res = await API.post(`/admin/resend-manager-invitation/${id}`);
+      toast.success(res.data.message);
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
   return (
     <AdminContext.Provider
       value={{
@@ -79,6 +88,7 @@ export const AdminProvider = ({ children }) => {
         DeleteManager,
         pendingManagers,
         getPendingManagers,
+        resendManagerInvitation,
       }}
     >
       {children}

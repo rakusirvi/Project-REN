@@ -15,7 +15,7 @@ import { timeFormatter } from "../../Libs/lib";
 export default function ManagerCard({ m }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [model, setModel] = useState(false);
-  const { DeleteManager } = useAdmin();
+  const { DeleteManager, resendManagerInvitation } = useAdmin();
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
@@ -89,12 +89,16 @@ export default function ManagerCard({ m }) {
               <button className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-medium text-white/70 hover:bg-white/5 transition-colors border-b border-white/5">
                 <Edit2 size={14} className="text-blue-400" /> EDIT PROFILE
               </button>
-              <button
-                onClick={() => {}}
-                className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-medium text-white/70 hover:bg-white/5 transition-colors border-b border-white/5"
-              >
-                <Users size={14} className="text-blue-400" /> Resend Token
-              </button>
+              {m.joined || (
+                <button
+                  onClick={() => {
+                    resendManagerInvitation(m._id);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-[11px] font-medium text-white/70 hover:bg-white/5 transition-colors border-b border-white/5"
+                >
+                  <Users size={14} className="text-blue-400" /> Resend Token
+                </button>
+              )}
               <button
                 onClick={() => {
                   DeleteManager(m._id);
@@ -119,7 +123,7 @@ export default function ManagerCard({ m }) {
       </div>
 
       {/* Stats / Footer Toggle */}
-      {m.verified && (
+      {m.joined && (
         <button
           onClick={() => setModel(true)}
           className="w-full flex items-center justify-between pt-4 border-t border-white/5 group/btn"

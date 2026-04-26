@@ -33,7 +33,7 @@ export async function addManager(req, res) {
         email,
         "REN Joining Token",
         "",
-        getJoiningTokenHTML(joiningToken, type, type),
+        getJoiningTokenHTML(joiningToken, type),
       );
     }
 
@@ -64,11 +64,51 @@ export async function getAllManagers(req, res) {
   }
 }
 
+export async function resendManagerInvitation(req, res) {
+  try {
+    const { id } = req.params;
+    const manager = await Manager.findById({
+      _id: id,
+      admin_id: req.user.id,
+      verified: false,
+    });
+
+    if (!manager) {
+      return res.status(404).json({ message: "Manager not found" });
+    }
+
+    const joiningToken = generateJoiningToken();
+    const joiningTokenHash = await bcrypt.hash(joiningToken, 10);
+    manager.joiningTokenHash = joiningTokenHash;
+    manager.verified = false;
+    await manager.save();
+    console.log(joiningToken);
+    console.log(manager.email);
+    console.log(joiningTokenHash);
+
+    if (manager) {
+      sendEmail(
+        manager.email,
+        "REN Joining Token",
+        "",
+        getJoiningTokenHTML(joiningToken, manager.type),
+      );
+    }
+
+    return res.status(200).json({
+      message: "Manager Invitation Resent Successfully",
+      data: manager,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
 export async function getPendingManagers(req, res) {
   try {
     const managers = await Manager.find({
       admin_id: req.user.id,
-      verified: false,
+      joined: false,
     });
     return res.status(200).json({
       message: "Pending Managers fetched successfully",
