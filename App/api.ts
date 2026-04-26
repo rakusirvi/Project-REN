@@ -1,6 +1,4 @@
 import axios from 'axios';
-import Config from 'react-native-config';
-
 import { createMMKV } from 'react-native-mmkv';
 
 export const storage = createMMKV();
@@ -18,7 +16,7 @@ export const clearToken = () => {
 };
 
 const API = axios.create({
-  baseURL: Config.API_BASE_URL || 'http://172.16.57.149:5001/api',
+  baseURL: 'http://10.245.139.149:5001/api',
   withCredentials: true,
 });
 
@@ -40,9 +38,7 @@ API.interceptors.response.use(
 
       try {
         const res = await axios.post(
-          `${
-            Config.API_BASE_URL || 'http://172.16.57.149:5001/api'
-          }/auth/reload-token`,
+          `${'http://10.245.139.149:5001/api'}/auth/reload-token`,
           {},
           { withCredentials: true },
         );

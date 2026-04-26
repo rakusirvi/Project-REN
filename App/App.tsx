@@ -1,26 +1,41 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
+import { View, Text, ActivityIndicator } from 'react-native';
 // 1. Import your Provider and Hook
 import { AuthContextProvider } from './src/Context/authContext';
-// import { useAuth } from './src/Context/authContext';
+import { useAuth } from './src/Context/authContext';
 
 import Home from './src/Pages/Home';
 import Login from './src/Pages/Login';
 import SignUp from './src/Pages/SignUp';
-import Loader from './src/Components/Loader';
 
 const Stack = createNativeStackNavigator();
 
 // 2. Create a separate component for the actual navigation logic
 const RootNavigator = () => {
-  // const { isAuthenticated, isLoading, user } = useAuth();
-  const isAuthenticated = true;
-  const isLoading = false;
-  const user = true;
+  const { isAuthenticated, getMe, isLoading, user } = useAuth();
+
+  useEffect(() => {
+    getMe();
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   if (isLoading) {
-    return <Loader />;
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: '#000',
+          gap: 15,
+        }}
+      >
+        <ActivityIndicator size="large" color="#444" />
+        <Text style={{ color: '#fff' }}>Please Wait Loading ...</Text>
+      </View>
+    );
   }
 
   return (

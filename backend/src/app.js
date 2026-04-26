@@ -16,6 +16,7 @@ app.use(cookieParser());
 import AuthRoute from "./routes/auth.route.js";
 import AdminRoute from "./routes/admin.route.js";
 import ManagerRoute from "./routes/manager.route.js";
+import TestRoute from "./routes/test.route.js";
 
 app.use("/api/auth", AuthRoute);
 // This is For CEO
@@ -23,6 +24,7 @@ app.use("/api/admin", AdminRoute);
 // This is For Manager
 app.use("/api/manager", ManagerRoute);
 // app.use("/api/message")
+app.use("/api", TestRoute);
 
 // app.use("/api/employee", EmployeeRoute);
 

@@ -10,14 +10,23 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Dimensions,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '../Context/authContext';
 
 const { width, height } = Dimensions.get('window');
 
 const Login = ({ navigation }: { navigation: any }) => {
   const [role, setRole] = useState('Manager');
   const [state, setState] = useState('Login');
+  const [data, setData] = useState({
+    email: '',
+    password: '',
+  });
+
+  const { login, isLoading } = useAuth();
   const Heading =
     state === 'Login'
       ? 'Welcome Back'
@@ -31,6 +40,35 @@ const Login = ({ navigation }: { navigation: any }) => {
       : state === 'Token'
       ? 'Enter token to join'
       : 'Enter your new password to continue';
+
+  const handleLogin = () => {
+    if (!data.email || !data.password) {
+      Alert.alert('REN', 'Please fill all the fields');
+      return;
+    }
+    login(data, role);
+    setData({ email: '', password: '' });
+  };
+
+  if (isLoading) {
+    return (
+      <>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#000',
+            gap: 15,
+          }}
+        >
+          <ActivityIndicator size="large" color="#444" />
+          <Text style={{ color: '#fff' }}>Please Wait Loading ...</Text>
+        </View>
+      </>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.background}>
@@ -88,6 +126,9 @@ const Login = ({ navigation }: { navigation: any }) => {
                     placeholderTextColor="#666"
                     keyboardType="email-address"
                     autoCapitalize="none"
+                    onChange={e =>
+                      setData({ ...data, email: e.nativeEvent.text })
+                    }
                     autoCorrect={false}
                     returnKeyType="next"
                     blurOnSubmit={false}
@@ -98,15 +139,16 @@ const Login = ({ navigation }: { navigation: any }) => {
                     placeholderTextColor="#666"
                     autoCapitalize="none"
                     autoCorrect={false}
+                    onChange={e =>
+                      setData({ ...data, password: e.nativeEvent.text })
+                    }
                     returnKeyType="next"
                     blurOnSubmit={false}
                     secureTextEntry
                   />
 
                   <TouchableOpacity
-                    onPress={() => {
-                      navigation.replace('Home');
-                    }}
+                    onPress={handleLogin}
                     style={styles.loginButton}
                   >
                     <Text style={styles.loginButtonText}>Login as {role}</Text>

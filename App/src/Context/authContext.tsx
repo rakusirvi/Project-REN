@@ -7,8 +7,9 @@ interface AuthContextType {
   isAuthenticated: boolean;
   setIsAuthenticated: (value: boolean) => void;
   isLoading: boolean;
+
   getMe: () => void;
-  login: (data: any, role: string) => void;
+  login: (data: { email: string; password: string }, role: string) => void;
   logout: () => void;
 }
 
@@ -39,8 +40,8 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
       setToken(res.data.accessToken);
       setUser(res.data.data);
       setIsAuthenticated(true);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log(error.response?.data?.message);
       setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
