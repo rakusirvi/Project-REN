@@ -3,6 +3,7 @@ import Manager from "../models/manager.model.js";
 import sendEmail from "../services/emailService.js";
 import bcrypt from "bcrypt";
 import Employee from "../models/employee.model.js";
+import Leave from "../models/leave.model.js";
 
 //DONE
 export async function addManager(req, res) {
@@ -199,5 +200,70 @@ export async function getManagerEmployee(req, res) {
     });
   } catch (error) {
     console.error("Get Manager Employee Error:", error.message);
+  }
+}
+
+export async function getManagerLeaveRequests(req, res) {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Only admin can view this" });
+    }
+
+    const leaves = await Leave.find({
+      applicant_role: "manager",
+      reviewer_role: "admin",
+      reviewer_id: req.user.id,
+    })
+      .populate("applicant_id", "name email")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      message: "Manager leave requests fetched successfully",
+      data: leaves,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function respondToManagerLeave(req, res) {
+  try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Only admin can respond" });
+    }
+
+    const { id } = req.params;
+    const { status, response } = req.body;
+
+    if (!["approved", "rejected"].includes(status)) {
+      return res
+        .status(400)
+        .json({ message: "status must be either approved or rejected" });
+    }
+
+    const leave = await Leave.findOne({
+      _id: id,
+      applicant_role: "manager",
+      reviewer_role: "admin",
+      reviewer_id: req.user.id,
+    });
+
+    if (!leave) {
+      return res.status(404).json({ message: "Leave request not found" });
+    }
+
+    leave.status = status;
+    leave.response = response ?? "";
+    leave.responded_at = new Date();
+    await leave.save();
+
+    return res.status(200).json({
+      message: "Leave response submitted successfully",
+      data: leave,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 }

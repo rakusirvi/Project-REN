@@ -1,5 +1,6 @@
 import { generateJoiningToken, getJoiningTokenHTML } from "../Libs/libs.js";
 import Employee from "../models/employee.model.js";
+import Leave from "../models/leave.model.js";
 import sendEmail from "../services/emailService.js";
 import bcrypt from "bcrypt";
 
@@ -112,6 +113,142 @@ export async function deleteEmployee(req, res) {
     }
     return res.status(404).json({
       message: "No Employee Found",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function ApplyLeave(req, res){
+  try {
+    if (req.user.role !== "manager") {
+      return res.status(403).json({ message: "Only manager can apply leave" });
+    }
+
+    const { startDate, endDate, file } = req.body;
+    if (!startDate || !endDate) {
+      return res
+        .status(400)
+        .json({ message: "startDate and endDate are required" });
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      return res.status(400).json({ message: "Invalid date format" });
+    }
+
+    if (end < start) {
+      return res
+        .status(400)
+        .json({ message: "endDate must be after or equal to startDate" });
+    }
+
+    const leave = await Leave.create({
+      applicant_role: "manager",
+      applicant_id: req.user.id,
+      applicant_role_model: "Manager",
+      reviewer_role: "admin",
+      reviewer_id: req.user.admin_id,
+      reviewer_role_model: "Admin",
+      admin_id: req.user.admin_id,
+      manager_id: req.user.id,
+      start_date: start,
+      end_date: end,
+      file: file ?? null,
+    });
+
+    return res.status(201).json({
+      message: "Leave applied successfully",
+      data: leave,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function getManagerLeaves(req, res) {
+  try {
+    if (req.user.role !== "manager") {
+      return res.status(403).json({ message: "Only manager can view this" });
+    }
+
+    const leaves = await Leave.find({
+      applicant_role: "manager",
+      applicant_id: req.user.id,
+    }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      message: "Leaves fetched successfully",
+      data: leaves,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function getEmployeeLeaveRequests(req, res) {
+  try {
+    if (req.user.role !== "manager") {
+      return res.status(403).json({ message: "Only manager can view this" });
+    }
+
+    const leaves = await Leave.find({
+      applicant_role: "employee",
+      reviewer_role: "manager",
+      reviewer_id: req.user.id,
+    })
+      .populate("applicant_id", "name email")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      message: "Employee leave requests fetched successfully",
+      data: leaves,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function respondToEmployeeLeave(req, res) {
+  try {
+    if (req.user.role !== "manager") {
+      return res.status(403).json({ message: "Only manager can respond" });
+    }
+
+    const { id } = req.params;
+    const { status, response } = req.body;
+
+    if (!["approved", "rejected"].includes(status)) {
+      return res
+        .status(400)
+        .json({ message: "status must be either approved or rejected" });
+    }
+
+    const leave = await Leave.findOne({
+      _id: id,
+      applicant_role: "employee",
+      reviewer_role: "manager",
+      reviewer_id: req.user.id,
+    });
+
+    if (!leave) {
+      return res.status(404).json({ message: "Leave request not found" });
+    }
+
+    leave.status = status;
+    leave.response = response ?? "";
+    leave.responded_at = new Date();
+    await leave.save();
+
+    return res.status(200).json({
+      message: "Leave response submitted successfully",
+      data: leave,
     });
   } catch (error) {
     console.log(error);

@@ -44,7 +44,7 @@ export const AuthContextProvider = ({ children }) => {
     try {
       await API.post("/auth/logout");
     } catch (error) {
-      console.log("Logout API failed");
+      console.log("Logout API failed", error);
     }
 
     // always clear
@@ -57,14 +57,17 @@ export const AuthContextProvider = ({ children }) => {
 
   const signup = async (data) => {
     try {
+      setIsLoading(true);
       const res = await API.post("/auth/admin/signup", data);
       toast.success(res.data.message);
       return res.data; // Return data to the component
     } catch (error) {
+      console.log(error);
       const msg = error.response?.data?.message || "Email Already Exists";
       toast.error(msg);
       return null; // Return null so handleSignUp knows it failed
     } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,9 +90,17 @@ export const AuthContextProvider = ({ children }) => {
 
   const setPassword = async (role, data) => {
     try {
+      setIsLoading(true);
       const res = await API.post(`/auth/${role}/set-password`, data);
+      toast.success(res.data.message);
+      return res.data;
     } catch (error) {
       console.log(error.message);
+      const msg = error.response?.data?.message || "Internal Server Error";
+      toast.error(msg);
+      return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -104,6 +115,7 @@ export const AuthContextProvider = ({ children }) => {
         login,
         logout,
         verifyOtp,
+        setPassword,
       }}
     >
       {children}
@@ -111,4 +123,5 @@ export const AuthContextProvider = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);
