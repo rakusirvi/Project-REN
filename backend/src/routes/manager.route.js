@@ -19,6 +19,8 @@ ManagerRoute.get("/get-all-employees", authMiddleware, getAllEmployees);
 ManagerRoute.get("/get-employee/:id", authMiddleware, getEmployeeById);
 ManagerRoute.put("/update-employee/:id", authMiddleware, updateEmployee);
 ManagerRoute.delete("/delete-employee/:id", authMiddleware, deleteEmployee);
+
+
 ManagerRoute.post("/apply-leave", authMiddleware, ApplyLeave);
 ManagerRoute.get("/my-leaves", authMiddleware, getManagerLeaves);
 ManagerRoute.get(

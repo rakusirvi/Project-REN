@@ -6,7 +6,7 @@ export async function applyEmployeeLeave(req, res) {
       return res.status(403).json({ message: "Only employee can apply leave" });
     }
 
-    const { startDate, endDate, file } = req.body;
+    const { startDate, endDate, file ,reason } = req.body;
     if (!startDate || !endDate) {
       return res
         .status(400)
@@ -38,6 +38,7 @@ export async function applyEmployeeLeave(req, res) {
       start_date: start,
       end_date: end,
       file: file ?? null,
+      reason: reason ?? "",
     });
 
     return res.status(201).json({
@@ -59,6 +60,7 @@ export async function getEmployeeLeaves(req, res) {
     const leaves = await Leave.find({
       applicant_role: "employee",
       applicant_id: req.user.id,
+      manager_id: req.user.manager_id,
     }).sort({ createdAt: -1 });
 
     return res.status(200).json({

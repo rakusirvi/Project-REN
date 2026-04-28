@@ -26,8 +26,6 @@ app.use("/api/admin", AdminRoute);
 // This is For Manager
 app.use("/api/manager", ManagerRoute);
 // app.use("/api/message")
-
-
 app.use("/api/employee", EmployeeRoute);
 
 export default app;
