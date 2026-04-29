@@ -54,6 +54,12 @@ const ManagerSchema = new mongoose.Schema(
     password_hash: {
       type: String,
     },
+
+    leave_balance: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   {
     timestamps: true,
@@ -63,3 +69,4 @@ const ManagerSchema = new mongoose.Schema(
 const Manager = mongoose.model("Manager", ManagerSchema);
 
 export default Manager;
+ 

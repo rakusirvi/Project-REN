@@ -16,7 +16,6 @@ app.use(cookieParser());
 import AuthRoute from "./routes/auth.route.js";
 import AdminRoute from "./routes/admin.route.js";
 import ManagerRoute from "./routes/manager.route.js";
-
 import EmployeeRoute from "./routes/employee.route.js";
 
 

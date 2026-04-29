@@ -117,8 +117,11 @@ export default function ManagerCard({ m }) {
         <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold text-white/80 uppercase tracking-wider bg-white/5 border border-white/10">
           {m.type}
         </span>
+        <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold text-white/80 uppercase tracking-wider bg-white/5 border border-white/10">
+          Join : {timeFormatter(m.createdAt)}
+        </span>
         <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-bold text-white/80 uppercase tracking-wider bg-white/5 border border-white/10">
-          {timeFormatter(m.createdAt)}
+          Leaves : {m.leave_balance || 0}
         </span>
       </div>
 

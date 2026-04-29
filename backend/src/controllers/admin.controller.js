@@ -253,10 +253,20 @@ export async function respondToManagerLeave(req, res) {
       return res.status(404).json({ message: "Leave request not found" });
     }
 
+    const wasApproved = leave.status === "approved";
+
     leave.status = status;
     leave.response = response ?? "";
     leave.responded_at = new Date();
     await leave.save();
+
+    if (status === "approved" && !wasApproved) {
+      const manager = await Manager.findById(leave.applicant_id);
+      if (manager) {
+        manager.leave_balance = (manager.leave_balance ?? 0) + 1;
+        await manager.save();
+      }
+    }
 
     return res.status(200).json({
       message: "Leave response submitted successfully",

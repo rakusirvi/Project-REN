@@ -61,6 +61,33 @@ const EmployeeSchema = new mongoose.Schema(
     password_hash: {
       type: String,
     },
+
+    // Leave Management Fields
+    leave_balance: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    leave_history: [
+      {
+        leave_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "LeaveRequest",
+        },
+        status: {
+          type: String,
+          enum: ["approved", "rejected"],
+        },
+        start_date: {
+          type: Date,
+          required: true,
+        },
+        end_date: {
+          type: Date,
+          required: true,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
