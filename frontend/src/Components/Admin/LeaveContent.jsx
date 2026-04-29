@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Check,
   X,
@@ -14,104 +14,30 @@ import {
   Dot,
 } from "lucide-react";
 
+import { timeFormatter } from "../../Libs/lib";
+import { useAdmin } from "../../ContextAPI/AdminContext";
+
 const AdminLeaveDashboard = () => {
-  const requests = [
-    {
-      _id: "1",
-      applicant_id: {
-        name: "Rakesh Choudhary",
-        email: "rakeshChoudhary1154@gmail.com",
-      },
-      start_date: "2024-05-20",
-      end_date: "2024-05-25",
-      file: "https://google.com",
-      status: "rejected",
-      reason: "i am ill",
-    },
-    {
-      _id: "2",
-      applicant_id: {
-        name: "Rakesh Choudhary",
-        email: "rakeshChoudhary1154@gmail.com",
-      },
-      start_date: "2024-05-20",
-      end_date: "2024-05-25",
-      file: "https://google.com",
-      status: "approved",
-      reason: "i am ill",
-    },
-    {
-      _id: "3",
-      applicant_id: {
-        name: "Rakesh Choudhary",
-        email: "rakeshChoudhary1154@gmail.com",
-      },
-      start_date: "2024-05-20",
-      end_date: "2024-05-25",
-      file: "https://google.com",
-      status: "approved",
-      reason: "i am ill",
-    },
-    {
-      _id: "4",
-      applicant_id: {
-        name: "Rakesh Choudhary",
-        email: "rakeshChoudhary1154@gmail.com",
-      },
-      start_date: "2024-05-20",
-      end_date: "2024-05-25",
-      file: "https://google.com",
-      status: "approved",
-      reason: "i am ill",
-    },
-    {
-      _id: "5",
-      applicant_id: {
-        name: "Rakesh Choudhary",
-        email: "rakeshChoudhary1154@gmail.com",
-      },
-      start_date: "2024-05-20",
-      end_date: "2024-05-25",
-      file: "https://google.com",
-      status: "approved",
-      reason: "i am ill",
-    },
-    {
-      _id: "6",
-      applicant_id: {
-        name: "Rakesh Choudhary",
-        email: "rakeshChoudhary1154@gmail.com",
-      },
-      start_date: "2024-05-20",
-      end_date: "2024-05-25",
-      file: "https://google.com",
-      status: "approved",
-      reason: "i am ill",
-    },
-    {
-      _id: "7",
-      applicant_id: {
-        name: "Rakesh Choudhary",
-        email: "rakeshChoudhary1154@gmail.com",
-      },
-      start_date: "2024-05-20",
-      end_date: "2024-05-25",
-      file: "https://google.com",
-      status: "approved",
-      reason: "i am ill",
-    },
-  ];
+  const {
+    getManagerLeaveRequests,
+    managerLeaveRequests,
+    respondLeaveRequest,
+  } = useAdmin();
 
-  // Existing holidays in Database
+  useEffect(() => {
+    getManagerLeaveRequests();
+  }, [getManagerLeaveRequests]);
+
+  const requests = managerLeaveRequests.filter(
+    (req) => req.status === "pending",
+  );
+
   const [savedHolidays, setSavedHolidays] = useState(["2026-04-10"]);
-  // Dates selected in current session but not yet posted
   const [selectedBatch, setSelectedBatch] = useState([]);
-  // Current view of the calendar
-  const [viewDate, setViewDate] = useState(new Date(2026, 3, 1)); // April 2026
+  const [viewDate, setViewDate] = useState(new Date(2026, 3, 1));
 
-  // --- Add these states at the top of your component ---
-  const [processingId, setProcessingId] = useState(null); // Which card is being responded to
-  const [adminResponse, setAdminResponse] = useState(""); // The message text
+  const [processingId, setProcessingId] = useState(null);
+  const [adminResponse, setAdminResponse] = useState("");
   const [loading, setLoading] = useState(false);
 
   // --- The Submission Function ---
@@ -123,13 +49,9 @@ const AdminLeaveDashboard = () => {
 
     setLoading(true);
     try {
-      // In your real REN App:
-      // await axios.post(`/api/leave/respond/${id}`, { status, response: adminResponse });
-
-      alert(`Request ${status} successfully!`);
+      respondLeaveRequest(id, status, adminResponse);
       setProcessingId(null);
       setAdminResponse("");
-      // Here you would typically re-fetch your requests
     } catch (err) {
       console.error(err);
     } finally {
@@ -178,7 +100,7 @@ const AdminLeaveDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 p-6  text-white animate-in fade-in duration-500">
+    <div className="flex flex-col lg:flex-row gap-6 px-6 py-1  text-white animate-in fade-in duration-500">
       {/* LEFT: LEAVE REQUESTS */}
       <div className="flex-1 space-y-6">
         <div className="flex justify-between items-center">
@@ -240,9 +162,9 @@ const AdminLeaveDashboard = () => {
                   </span>
                   <div className="flex items-center gap-2 text-sm text-white/80">
                     <CalIcon size={14} className="text-blue-500" />
-                    <span>{req.start_date}</span>
+                    <span>{timeFormatter(req.start_date)}</span>
                     <ChevronRight size={12} className="text-white/20" />
-                    <span>{req.end_date}</span>
+                    <span>{timeFormatter(req.end_date)}</span>
                   </div>
                 </div>
                 <div className="space-y-1">
@@ -307,8 +229,8 @@ const AdminLeaveDashboard = () => {
         </div>
       </div>
 
-      {/* RIGHT: DYNAMIC HOLIDAY PLANNER */}
       <div className="w-full lg:w-96 space-y-4">
+        {/* HOLIDAY PLANNER */}
         <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-6 backdrop-blur-xl shadow-2xl">
           {/* Calendar Header */}
           <div className="flex items-center justify-between mb-6">
@@ -337,8 +259,8 @@ const AdminLeaveDashboard = () => {
           </div>
 
           <div className="grid grid-cols-7 gap-1 text-center mb-2">
-            {["S", "M", "T", "W", "T", "F", "S"].map((d) => (
-              <div key={d} className="text-[10px] font-bold text-white/20">
+            {["S", "M", "T", "W", "T", "F", "S"].map((d, index) => (
+              <div key={index} className="text-[10px] font-bold text-white/20">
                 {d}
               </div>
             ))}
@@ -405,7 +327,9 @@ const AdminLeaveDashboard = () => {
             )}
           </div>
         </div>
-        <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-3 backdrop-blur-xl shadow-2xl flex flex-col h-[500px]">
+
+        {/* ACTION LOGS */}
+        <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-3 backdrop-blur-xl shadow-2xl flex flex-col h-[400px]">
           {/* Header for the Container */}
           <div className="flex items-center justify-between mb-6 shrink-0">
             <h2 className="text-lg font-bold flex items-center gap-2">
@@ -418,11 +342,11 @@ const AdminLeaveDashboard = () => {
           </div>
 
           {/* Scrollable Area */}
-          <div className="flex-1 overflow-y-auto pr-2 space-y-2 custom-scrollbar">
-            {requests.filter(
+          <div className="flex-1 overflow-y-auto  pr-2 space-y-2 custom-scrollbar">
+            {managerLeaveRequests.filter(
               (r) => r.status === "approved" || r.status === "rejected",
             ).length > 0 ? (
-              requests
+              managerLeaveRequests
                 .filter(
                   (r) => r.status === "approved" || r.status === "rejected",
                 )
@@ -458,17 +382,14 @@ const AdminLeaveDashboard = () => {
 
                       <div className="flex items-center gap-2 text-[11px] text-white/30">
                         <CalIcon size={10} />
-                        <span>{log.start_date}</span>
+                        <span>{timeFormatter(log.start_date)}</span>
                         <Dot size={10} />
-                        <span>{log.end_date}</span>
-                        {log.reason && (
-                          <>
-                            <span className="w-1 h-1 rounded-full bg-white/10" />
-                            <span className="truncate italic">
-                              "{log.reason}"
-                            </span>
-                          </>
-                        )}
+                        <span>{timeFormatter(log.end_date)}</span>
+                      </div>
+                      <div className="flex mt-2 items-center gap-2 text-[11px] text-white/30">
+                        <>
+                          <span className="truncate italic">{log.reason}</span>
+                        </>
                       </div>
                     </div>
                   </div>

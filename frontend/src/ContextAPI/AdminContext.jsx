@@ -8,6 +8,7 @@ export const AdminProvider = ({ children }) => {
   const [managers, setManager] = useState([]);
   const [managerEmployess, setManagerEmployess] = useState([]);
   const [pendingManagers, setPendingManagers] = useState([]);
+  const [managerLeaveRequests, setManagerLeaveRequests] = useState([]);
 
   const getManagers = async () => {
     try {
@@ -68,6 +69,28 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  const getManagerLeaveRequests = async () => {
+    try {
+      const res = await API.get("/admin/manager-leave-requests");
+      setManagerLeaveRequests(res.data.data);
+    } catch (error) {
+      console.error("Fetch Manager Leave Requests Error:", error);
+    }
+  };
+
+  const respondLeaveRequest = async (id, status, response) => {
+    try {
+      await API.put(`/admin/respond-manager-leave/${id}`, {
+        status,
+        response,
+      });
+      toast.success("Leave " + status);
+      await getManagerLeaveRequests();
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
   const resendManagerInvitation = async (id) => {
     try {
       const res = await API.post(`/admin/resend-manager-invitation/${id}`);
@@ -89,6 +112,9 @@ export const AdminProvider = ({ children }) => {
         pendingManagers,
         getPendingManagers,
         resendManagerInvitation,
+        getManagerLeaveRequests,
+        managerLeaveRequests,
+        respondLeaveRequest,
       }}
     >
       {children}

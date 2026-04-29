@@ -26,9 +26,8 @@ AdminRoute.post(
 AdminRoute.get("/getManagerEmployee/:id", authMiddleware, getManagerEmployee);
 AdminRoute.get("/get-manager/:id", authMiddleware, getManagerById);
 
-
-
 AdminRoute.put("/update-manager/:id", authMiddleware, updateManager);
+
 AdminRoute.get("/manager-leave-requests", authMiddleware, getManagerLeaveRequests);
 AdminRoute.put(
   "/respond-manager-leave/:id",
