@@ -69,4 +69,3 @@ const ManagerSchema = new mongoose.Schema(
 const Manager = mongoose.model("Manager", ManagerSchema);
 
 export default Manager;
- 
