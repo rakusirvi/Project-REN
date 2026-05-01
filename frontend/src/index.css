@@ -18,3 +18,37 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(59, 130, 246, 0.5); /* Blue glow on hover */
 }
+
+/* Add this to your main CSS file or module */
+
+/* The outer Bento Container */
+.bento-leave-container {
+  @apply relative rounded-3xl border transition-all duration-300;
+  height: 110px; /* Precise fixed height for alignment */
+  background: rgba(24, 24, 27, 0.6); /* zinc-900/60 */
+  border-color: rgba(255, 255, 255, 0.04); /* white/4 */
+  overflow: hidden;
+  will-change: transform; /* Hint to the browser for swipe performance */
+}
+
+/* The fixed-position background action layer */
+.swipe-background-action {
+  @apply absolute inset-0 flex items-center justify-start pl-7 z-10;
+  transition: opacity 0.3s ease;
+}
+
+/* The actual swipeable card (foreground) */
+.swipeable-card-foreground {
+  @apply absolute inset-0 flex items-center gap-5 p-6 z-20;
+  @apply bg-zinc-950/90 backdrop-blur-3xl;
+  cursor: grab;
+}
+
+/* Luxury transitions and UI states */
+.swipeable-card-foreground:active {
+  cursor: grabbing;
+}
+
+.card-snap-back {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}

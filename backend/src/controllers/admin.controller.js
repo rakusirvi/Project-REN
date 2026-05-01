@@ -120,6 +120,83 @@ export async function getPendingManagers(req, res) {
   }
 }
 
+export async function addMultipleManager(req, res) {
+  try {
+    const { managers } = req.body;
+
+    if (!managers || managers.length === 0) {
+      return res.status(400).json({ message: "No managers provided" });
+    }
+
+    // 1. Extract all incoming emails to check at once
+    const incomingEmails = managers.map((m) => m.email);
+
+    // 2. Perform ONE database query to find all existing matches
+    const existingManagers = await Manager.find({
+      company_name: req.user.company_name, // Ensuring scope is within the company
+      email: { $in: incomingEmails },
+    });
+
+    // 3. Create a Set of found emails for instant O(1) lookup
+    const existingEmailSet = new Set(existingManagers.map((m) => m.email));
+
+    const managersToSave = [];
+    const emailQueue = [];
+    const skipped = [];
+
+    // 4. Filter and process
+    for (const manager of managers) {
+      if (existingEmailSet.has(manager.email)) {
+        skipped.push(manager.email);
+        continue; // Skip duplicates
+      }
+
+      const joiningToken = generateJoiningToken();
+      const joiningTokenHash = await bcrypt.hash(joiningToken, 10);
+
+      managersToSave.push({
+        admin_id: req.user.id,
+        company_name: req.user.company_name,
+        name: manager.name,
+        email: manager.email,
+        type: manager.type,
+        joiningTokenHash,
+      });
+
+      emailQueue.push({
+        email: manager.email,
+        joiningToken,
+        type: manager.type,
+      });
+    }
+
+    // 5. Batch Insert
+    if (managersToSave.length > 0) {
+      await Manager.insertMany(managersToSave);
+
+      // 6. Send Emails
+      emailQueue.forEach((entry) => {
+        sendEmail(
+          entry.email,
+          "REN Joining Token",
+          "",
+          getJoiningTokenHTML(entry.joiningToken, entry.type),
+        );
+      });
+    }
+
+    return res.status(201).json({
+      message: "Bulk processing finished",
+      createdCount: managersToSave.length,
+      skippedCount: skipped.length,
+      skippedEmails: skipped,
+    });
+  } catch (error) {
+    console.error("Add Multiple Manager Error:", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
 export async function getManagerById(req, res) {
   try {
     const manager = await Manager.findById(req.params.id);
