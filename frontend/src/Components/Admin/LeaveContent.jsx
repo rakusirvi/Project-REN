@@ -12,6 +12,7 @@ import {
   Trash2,
   Eye,
   Dot,
+  MoreHorizontal,
 } from "lucide-react";
 
 import { useAdmin } from "../../ContextAPI/AdminContext";
@@ -70,13 +71,12 @@ const AdminLeaveDashboard = () => {
             <h2 className="text-lg font-bold flex items-center gap-2">
               <Bell className="text-blue-500" size={18} />
               Action Logs
+              <span className="text-[10px] bg-white/5 px-2 py-1 rounded-md text-white/40 font-bold uppercase tracking-widest">
+                History
+              </span>
             </h2>
-            <span className="text-[10px] bg-white/5 px-2 py-1 rounded-md text-white/40 font-bold uppercase tracking-widest">
-              History
-            </span>
           </div>
 
-          {/* Scrollable Area */}
           <div className="flex-1 overflow-y-auto  pr-2 space-y-2 custom-scrollbar">
             {managerLeaveRequests.filter(
               (r) => r.status === "approved" || r.status === "rejected",
