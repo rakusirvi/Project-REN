@@ -31,7 +31,7 @@ const AdminLeaveDashboard = () => {
     }
   }, [getManagerLeaveRequests]);
 
-  const requests = managerLeaveRequests.filter(
+  const requests = managerLeaveRequests?.filter(
     (req) => req.status === "pending",
   );
 

@@ -73,6 +73,7 @@ export const AdminProvider = ({ children }) => {
     try {
       const res = await API.get("/admin/manager-leave-requests");
       setManagerLeaveRequests(res.data.data);
+      console.log("list of manager leave requests:", res.data.data);
     } catch (error) {
       console.error("Fetch Manager Leave Requests Error:", error);
     }
